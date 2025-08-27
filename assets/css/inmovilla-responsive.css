@@ -1,0 +1,396 @@
+/*!
+ * Inmovilla Properties - Responsive Styles
+ * Version: 1.0.0
+ */
+
+/* ===================================
+   BREAKPOINTS
+=================================== */
+/* 
+  - xs: 0-575px (móviles)
+  - sm: 576px-767px (móviles grandes)  
+  - md: 768px-991px (tablets)
+  - lg: 992px-1199px (desktop)
+  - xl: 1200px+ (desktop grande)
+*/
+
+/* ===================================
+   MÓVILES (0-767px)
+=================================== */
+@media (max-width: 767px) {
+    /* Contenedor principal */
+    .inmovilla-container {
+        padding: 10px;
+    }
+
+    /* Grid de propiedades - 1 columna en móvil */
+    .inmovilla-properties-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin: 20px 0;
+    }
+
+    /* Tarjetas de propiedades */
+    .inmovilla-property-card {
+        margin-bottom: 20px;
+    }
+
+    .inmovilla-property-content {
+        padding: 15px;
+    }
+
+    .inmovilla-property-title {
+        font-size: 16px;
+    }
+
+    .inmovilla-property-price {
+        font-size: 20px;
+    }
+
+    /* Características en móvil */
+    .inmovilla-property-features {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .inmovilla-feature {
+        min-width: calc(33.33% - 10px);
+    }
+
+    /* Buscador responsive */
+    .inmovilla-search-form {
+        padding: 20px 15px;
+    }
+
+    .inmovilla-search-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .inmovilla-form-control {
+        font-size: 16px; /* Evita zoom en iOS */
+    }
+
+    /* Botones más grandes en móvil */
+    .inmovilla-btn {
+        padding: 15px 20px;
+        width: 100%;
+        font-size: 16px;
+    }
+
+    /* Ficha individual */
+    .inmovilla-single-property {
+        margin: 10px;
+    }
+
+    .inmovilla-property-gallery {
+        height: 250px;
+    }
+
+    .inmovilla-property-info {
+        padding: 20px 15px;
+    }
+
+    .inmovilla-property-header {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .inmovilla-property-meta {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .inmovilla-meta-item {
+        padding: 10px;
+    }
+
+    .inmovilla-meta-value {
+        font-size: 18px;
+    }
+
+    /* Paginación */
+    .inmovilla-pagination {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .inmovilla-pagination a,
+    .inmovilla-pagination span {
+        padding: 8px 12px;
+        min-width: 40px;
+    }
+
+    /* Filtros */
+    .inmovilla-filters {
+        padding: 15px;
+    }
+
+    .inmovilla-filter-toggle {
+        font-size: 14px;
+        width: 100%;
+        text-align: left;
+        padding: 10px;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+    }
+
+    /* Mapa responsive */
+    .inmovilla-map-container {
+        height: 200px;
+        margin: 20px 0;
+    }
+
+    /* Ocultar elementos en móvil */
+    .inmovilla-hide-mobile {
+        display: none !important;
+    }
+
+    .inmovilla-show-mobile {
+        display: block !important;
+    }
+}
+
+/* ===================================
+   TABLETS (768px-991px)
+=================================== */
+@media (min-width: 768px) and (max-width: 991px) {
+    /* Grid 2 columnas en tablet */
+    .inmovilla-properties-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+
+    /* Buscador en tablet */
+    .inmovilla-search-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    /* Ficha en tablet */
+    .inmovilla-property-meta {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Contenedor en tablet */
+    .inmovilla-container {
+        padding: 15px;
+    }
+
+    .inmovilla-hide-tablet {
+        display: none !important;
+    }
+}
+
+/* ===================================
+   DESKTOP (992px+)
+=================================== */
+@media (min-width: 992px) {
+    /* Grid 3-4 columnas en desktop */
+    .inmovilla-properties-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+
+    /* Buscador completo en desktop */
+    .inmovilla-search-row {
+        grid-template-columns: repeat(4, 1fr);
+        align-items: end;
+    }
+
+    /* Hover effects solo en desktop */
+    .inmovilla-property-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .inmovilla-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Meta en desktop */
+    .inmovilla-property-meta {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .inmovilla-hide-desktop {
+        display: none !important;
+    }
+}
+
+/* ===================================
+   DESKTOP GRANDE (1200px+)
+=================================== */
+@media (min-width: 1200px) {
+    /* Contenedor más ancho */
+    .inmovilla-container {
+        max-width: 1400px;
+    }
+
+    /* Grid con más columnas */
+    .inmovilla-properties-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 30px;
+    }
+
+    /* Buscador extendido */
+    .inmovilla-search-row {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+/* ===================================
+   ORIENTACIÓN LANDSCAPE MÓVIL
+=================================== */
+@media (max-height: 500px) and (orientation: landscape) {
+    .inmovilla-property-gallery {
+        height: 180px;
+    }
+
+    .inmovilla-search-form {
+        padding: 15px;
+    }
+
+    .inmovilla-property-info {
+        padding: 15px;
+    }
+}
+
+/* ===================================
+   PRINT STYLES
+=================================== */
+@media print {
+    /* Ocultar elementos innecesarios */
+    .inmovilla-search-form,
+    .inmovilla-filters,
+    .inmovilla-favorite-btn,
+    .inmovilla-pagination {
+        display: none !important;
+    }
+
+    /* Ajustar para impresión */
+    .inmovilla-property-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+    }
+
+    .inmovilla-properties-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Colores para impresión */
+    .inmovilla-property-title a {
+        color: #000 !important;
+        text-decoration: underline;
+    }
+
+    .inmovilla-property-price {
+        color: #000 !important;
+    }
+}
+
+/* ===================================
+   ACCESIBILIDAD
+=================================== */
+
+/* Reducir movimiento si está habilitado */
+@media (prefers-reduced-motion: reduce) {
+    .inmovilla-property-card,
+    .inmovilla-btn,
+    .inmovilla-form-control,
+    .inmovilla-spinner {
+        transition: none !important;
+        animation: none !important;
+    }
+
+    .inmovilla-property-card:hover {
+        transform: none;
+    }
+
+    .inmovilla-btn:hover {
+        transform: none;
+    }
+}
+
+/* Alto contraste */
+@media (prefers-contrast: high) {
+    :root {
+        --inmovilla-border: #000;
+        --inmovilla-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    }
+
+    .inmovilla-property-card {
+        border: 2px solid #000;
+    }
+
+    .inmovilla-form-control {
+        border: 2px solid #000;
+    }
+}
+
+/* ===================================
+   UTILIDADES RESPONSIVE
+=================================== */
+
+/* Mostrar/ocultar por breakpoint */
+.d-mobile { display: none; }
+.d-tablet { display: none; }
+.d-desktop { display: none; }
+
+@media (max-width: 767px) {
+    .d-mobile { display: block; }
+    .d-tablet-up { display: none; }
+    .d-desktop-up { display: none; }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .d-tablet { display: block; }
+    .d-mobile-down { display: none; }
+    .d-desktop-up { display: none; }
+}
+
+@media (min-width: 992px) {
+    .d-desktop { display: block; }
+    .d-mobile-down { display: none; }
+    .d-tablet-down { display: none; }
+}
+
+/* Textos responsive */
+@media (max-width: 767px) {
+    .text-mobile-center { text-align: center !important; }
+    .text-mobile-left { text-align: left !important; }
+    .text-mobile-right { text-align: right !important; }
+}
+
+/* Espaciado responsive */
+@media (max-width: 767px) {
+    .p-mobile-0 { padding: 0 !important; }
+    .p-mobile-1 { padding: 10px !important; }
+    .p-mobile-2 { padding: 20px !important; }
+
+    .m-mobile-0 { margin: 0 !important; }
+    .m-mobile-1 { margin: 10px !important; }
+    .m-mobile-2 { margin: 20px !important; }
+}
+
+/* Grid responsive utilities */
+.col-mobile-12 { width: 100%; }
+.col-mobile-6 { width: 50%; }
+.col-mobile-4 { width: 33.333%; }
+
+@media (min-width: 768px) {
+    .col-tablet-12 { width: 100%; }
+    .col-tablet-6 { width: 50%; }
+    .col-tablet-4 { width: 33.333%; }
+    .col-tablet-3 { width: 25%; }
+}
+
+@media (min-width: 992px) {
+    .col-desktop-12 { width: 100%; }
+    .col-desktop-6 { width: 50%; }
+    .col-desktop-4 { width: 33.333%; }
+    .col-desktop-3 { width: 25%; }
+    .col-desktop-2 { width: 16.666%; }
+}

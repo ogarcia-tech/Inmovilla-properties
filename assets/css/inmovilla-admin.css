@@ -1,0 +1,435 @@
+/*!
+ * Inmovilla Properties - Admin Styles
+ * Version: 1.0.0
+ */
+
+/* ===================================
+   VARIABLES ADMIN
+=================================== */
+:root {
+    --inmovilla-admin-primary: #0073aa;
+    --inmovilla-admin-secondary: #0085ba;
+    --inmovilla-admin-success: #46b450;
+    --inmovilla-admin-warning: #ffb900;
+    --inmovilla-admin-error: #dc3232;
+    --inmovilla-admin-bg: #f1f1f1;
+    --inmovilla-admin-white: #ffffff;
+    --inmovilla-admin-border: #ccd0d4;
+    --inmovilla-admin-radius: 4px;
+}
+
+/* ===================================
+   PANEL PRINCIPAL ADMIN
+=================================== */
+.inmovilla-admin-wrap {
+    margin: 20px 20px 0 2px;
+}
+
+.inmovilla-admin-header {
+    background: var(--inmovilla-admin-white);
+    padding: 20px;
+    border: 1px solid var(--inmovilla-admin-border);
+    border-radius: var(--inmovilla-admin-radius);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.inmovilla-admin-title {
+    font-size: 23px;
+    font-weight: 400;
+    margin: 0;
+    color: #23282d;
+}
+
+.inmovilla-admin-version {
+    background: var(--inmovilla-admin-primary);
+    color: var(--inmovilla-admin-white);
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* ===================================
+   NAVEGACIÓN DE PESTAÑAS
+=================================== */
+.inmovilla-admin-nav {
+    background: var(--inmovilla-admin-white);
+    border: 1px solid var(--inmovilla-admin-border);
+    border-bottom: none;
+    border-radius: var(--inmovilla-admin-radius) var(--inmovilla-admin-radius) 0 0;
+    display: flex;
+    margin-bottom: 0;
+}
+
+.inmovilla-admin-nav-tab {
+    padding: 15px 20px;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--inmovilla-admin-border);
+    color: #666;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.inmovilla-admin-nav-tab:hover {
+    background: #f8f9fa;
+    color: var(--inmovilla-admin-primary);
+}
+
+.inmovilla-admin-nav-tab.active {
+    background: var(--inmovilla-admin-primary);
+    color: var(--inmovilla-admin-white);
+}
+
+.inmovilla-admin-nav-tab:last-child {
+    border-right: none;
+}
+
+/* ===================================
+   CONTENIDO DE PESTAÑAS
+=================================== */
+.inmovilla-admin-content {
+    background: var(--inmovilla-admin-white);
+    border: 1px solid var(--inmovilla-admin-border);
+    border-radius: 0 0 var(--inmovilla-admin-radius) var(--inmovilla-admin-radius);
+    padding: 20px;
+}
+
+.inmovilla-tab-content {
+    display: none;
+}
+
+.inmovilla-tab-content.active {
+    display: block;
+}
+
+/* ===================================
+   FORMULARIOS ADMIN
+=================================== */
+.inmovilla-admin-form {
+    max-width: 800px;
+}
+
+.inmovilla-form-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.inmovilla-form-table th {
+    text-align: left;
+    padding: 20px 10px 20px 0;
+    width: 200px;
+    vertical-align: top;
+    font-weight: 600;
+}
+
+.inmovilla-form-table td {
+    padding: 15px 10px 20px 0;
+    vertical-align: top;
+}
+
+.inmovilla-form-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 8px 12px;
+    border: 1px solid var(--inmovilla-admin-border);
+    border-radius: var(--inmovilla-admin-radius);
+    font-size: 14px;
+}
+
+.inmovilla-form-input:focus {
+    border-color: var(--inmovilla-admin-primary);
+    box-shadow: 0 0 0 1px var(--inmovilla-admin-primary);
+    outline: none;
+}
+
+.inmovilla-form-textarea {
+    width: 100%;
+    max-width: 600px;
+    min-height: 100px;
+    padding: 8px 12px;
+    border: 1px solid var(--inmovilla-admin-border);
+    border-radius: var(--inmovilla-admin-radius);
+    font-family: inherit;
+    resize: vertical;
+}
+
+.inmovilla-form-select {
+    padding: 8px 12px;
+    border: 1px solid var(--inmovilla-admin-border);
+    border-radius: var(--inmovilla-admin-radius);
+    background: var(--inmovilla-admin-white);
+    font-size: 14px;
+}
+
+.inmovilla-form-checkbox {
+    margin-right: 8px;
+}
+
+.inmovilla-form-description {
+    color: #666;
+    font-size: 13px;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+/* ===================================
+   BOTONES ADMIN
+=================================== */
+.inmovilla-admin-btn {
+    background: var(--inmovilla-admin-primary);
+    color: var(--inmovilla-admin-white);
+    border: 1px solid var(--inmovilla-admin-primary);
+    padding: 10px 20px;
+    border-radius: var(--inmovilla-admin-radius);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.inmovilla-admin-btn:hover {
+    background: var(--inmovilla-admin-secondary);
+    border-color: var(--inmovilla-admin-secondary);
+    color: var(--inmovilla-admin-white);
+}
+
+.inmovilla-admin-btn:focus {
+    box-shadow: 0 0 0 1px #fff, 0 0 0 3px var(--inmovilla-admin-primary);
+    outline: none;
+}
+
+.inmovilla-admin-btn-secondary {
+    background: transparent;
+    color: var(--inmovilla-admin-primary);
+    border: 1px solid var(--inmovilla-admin-primary);
+}
+
+.inmovilla-admin-btn-secondary:hover {
+    background: var(--inmovilla-admin-primary);
+    color: var(--inmovilla-admin-white);
+}
+
+.inmovilla-admin-btn-success {
+    background: var(--inmovilla-admin-success);
+    border-color: var(--inmovilla-admin-success);
+}
+
+.inmovilla-admin-btn-warning {
+    background: var(--inmovilla-admin-warning);
+    border-color: var(--inmovilla-admin-warning);
+    color: #000;
+}
+
+.inmovilla-admin-btn-error {
+    background: var(--inmovilla-admin-error);
+    border-color: var(--inmovilla-admin-error);
+}
+
+/* ===================================
+   MENSAJES Y NOTIFICACIONES
+=================================== */
+.inmovilla-admin-notice {
+    padding: 12px;
+    border-left: 4px solid;
+    margin: 20px 0;
+    background: var(--inmovilla-admin-white);
+}
+
+.inmovilla-admin-notice.success {
+    border-left-color: var(--inmovilla-admin-success);
+    background: #f0f8f0;
+}
+
+.inmovilla-admin-notice.warning {
+    border-left-color: var(--inmovilla-admin-warning);
+    background: #fffbf0;
+}
+
+.inmovilla-admin-notice.error {
+    border-left-color: var(--inmovilla-admin-error);
+    background: #fdf0f0;
+}
+
+.inmovilla-admin-notice.info {
+    border-left-color: var(--inmovilla-admin-primary);
+    background: #f0f8ff;
+}
+
+/* ===================================
+   ESTADÍSTICAS Y DASHBOARD
+=================================== */
+.inmovilla-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.inmovilla-stat-card {
+    background: var(--inmovilla-admin-white);
+    padding: 20px;
+    border: 1px solid var(--inmovilla-admin-border);
+    border-radius: var(--inmovilla-admin-radius);
+    text-align: center;
+}
+
+.inmovilla-stat-number {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--inmovilla-admin-primary);
+    display: block;
+    margin-bottom: 10px;
+}
+
+.inmovilla-stat-label {
+    color: #666;
+    font-size: 14px;
+}
+
+/* ===================================
+   TABLAS DE DATOS
+=================================== */
+.inmovilla-admin-table {
+    width: 100%;
+    background: var(--inmovilla-admin-white);
+    border: 1px solid var(--inmovilla-admin-border);
+    border-radius: var(--inmovilla-admin-radius);
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.inmovilla-admin-table th,
+.inmovilla-admin-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--inmovilla-admin-border);
+}
+
+.inmovilla-admin-table th {
+    background: var(--inmovilla-admin-bg);
+    font-weight: 600;
+}
+
+.inmovilla-admin-table tr:hover {
+    background: #f8f9fa;
+}
+
+/* ===================================
+   HERRAMIENTAS Y UTILIDADES
+=================================== */
+.inmovilla-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.inmovilla-tool-card {
+    background: var(--inmovilla-admin-white);
+    padding: 20px;
+    border: 1px solid var(--inmovilla-admin-border);
+    border-radius: var(--inmovilla-admin-radius);
+}
+
+.inmovilla-tool-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #23282d;
+}
+
+.inmovilla-tool-description {
+    color: #666;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+/* ===================================
+   SELECTOR DE COLORES
+=================================== */
+.inmovilla-color-picker {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.inmovilla-color-input {
+    width: 50px;
+    height: 35px;
+    border: 1px solid var(--inmovilla-admin-border);
+    border-radius: var(--inmovilla-admin-radius);
+    cursor: pointer;
+}
+
+.inmovilla-color-value {
+    font-family: monospace;
+    font-size: 12px;
+    color: #666;
+}
+
+/* ===================================
+   LOADING ADMIN
+=================================== */
+.inmovilla-admin-loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.inmovilla-admin-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--inmovilla-admin-border);
+    border-radius: 50%;
+    border-top-color: var(--inmovilla-admin-primary);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===================================
+   RESPONSIVE ADMIN
+=================================== */
+@media (max-width: 768px) {
+    .inmovilla-admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .inmovilla-admin-nav {
+        flex-direction: column;
+    }
+
+    .inmovilla-admin-nav-tab {
+        border-right: none;
+        border-bottom: 1px solid var(--inmovilla-admin-border);
+    }
+
+    .inmovilla-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .inmovilla-form-table th,
+    .inmovilla-form-table td {
+        display: block;
+        width: 100%;
+        padding: 10px 0;
+    }
+
+    .inmovilla-form-table th {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+}
