@@ -135,9 +135,11 @@ final class InmovillaProperties {
 /**
  * Función global para iniciar el plugin
  */
-function InmovillaProperties() {
-    return InmovillaProperties::instance();
+if (!function_exists('inmovilla_properties')) {
+    function inmovilla_properties() {
+        return InmovillaProperties::instance();
+    }
 }
 
 // Arrancamos el plugin
-InmovillaProperties();
+inmovilla_properties();
