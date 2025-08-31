@@ -35,44 +35,46 @@ class Inmovilla_Ajax {
     public function load_properties() {
         check_ajax_referer('inmovilla_public_nonce', 'nonce');
         
-        $page = intval($_POST['page'] ?? 1);
-        $limit = intval($_POST['limit'] ?? 12);
-        $filters = $_POST['filters'] ?? array();
-        
+        $page   = absint($_POST['page'] ?? 1);
+        $limit  = absint($_POST['limit'] ?? 12);
+        $filters = isset($_POST['filters']) ? (array) $_POST['filters'] : array();
+
         // Sanitizar filtros
         $filters = $this->sanitize_filters($filters);
-        
+
         try {
-            $api = new Inmovilla_API();
-            $properties = $api->get_properties(array_merge($filters, array(
-                'page' => $page,
-                'limit' => $limit
+            $api      = new InmovillaAPI();
+            $response = $api->get_properties(array_merge($filters, array(
+                'page'  => $page,
+                'limit' => $limit,
             )));
-            
-            if (empty($properties)) {
+
+            if (is_wp_error($response) || empty($response['data'])) {
                 wp_send_json_error(array(
-                    'message' => __('No se encontraron propiedades', 'inmovilla-properties')
+                    'message' => __('No se encontraron propiedades', 'inmovilla-properties'),
                 ));
             }
-            
-            $html = '';
+
+            $properties = $response['data'];
+            $html       = '';
             foreach ($properties as $property) {
                 ob_start();
-                include INMOVILLA_PROPERTIES_PLUGIN_DIR . 'templates/property-card.php';
+
+                include INMOVILLA_PROPERTIES_TEMPLATES_DIR . 'property-card.php';
+
                 $html .= ob_get_clean();
             }
-            
+
             wp_send_json_success(array(
-                'html' => $html,
-                'total' => count($properties),
-                'page' => $page,
-                'has_more' => count($properties) === $limit
+                'html'     => $html,
+                'total'    => count($properties),
+                'page'     => $page,
+                'has_more' => count($properties) === $limit,
             ));
-            
         } catch (Exception $e) {
             wp_send_json_error(array(
                 'message' => __('Error al cargar las propiedades', 'inmovilla-properties'),
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage(),
             ));
         }
     }
@@ -83,48 +85,50 @@ class Inmovilla_Ajax {
     public function search_properties() {
         check_ajax_referer('inmovilla_public_nonce', 'nonce');
         
-        $search_data = $_POST['search'] ?? array();
-        $page = intval($_POST['page'] ?? 1);
-        $limit = intval($_POST['limit'] ?? 12);
-        
+        $search_data = isset($_POST['search']) ? (array) $_POST['search'] : array();
+        $page        = absint($_POST['page'] ?? 1);
+        $limit       = absint($_POST['limit'] ?? 12);
+
         // Sanitizar datos de búsqueda
         $search_params = $this->sanitize_search_data($search_data);
-        
+
         try {
-            $api = new Inmovilla_API();
-            $properties = $api->search_properties(array_merge($search_params, array(
-                'page' => $page,
-                'limit' => $limit
+            $api      = new InmovillaAPI();
+            $response = $api->get_properties(array_merge($search_params, array(
+                'page'  => $page,
+                'limit' => $limit,
             )));
-            
-            if (empty($properties)) {
+
+            if (is_wp_error($response) || empty($response['data'])) {
                 wp_send_json_success(array(
-                    'html' => '<div class="no-results"><p>' . __('No se encontraron propiedades que coincidan con tu búsqueda.', 'inmovilla-properties') . '</p></div>',
-                    'total' => 0,
-                    'page' => $page,
-                    'has_more' => false
+                    'html'     => '<div class="no-results"><p>' . __('No se encontraron propiedades que coincidan con tu búsqueda.', 'inmovilla-properties') . '</p></div>',
+                    'total'    => 0,
+                    'page'     => $page,
+                    'has_more' => false,
                 ));
             }
-            
-            $html = '';
+
+            $properties = $response['data'];
+            $html       = '';
             foreach ($properties as $property) {
                 ob_start();
-                include INMOVILLA_PROPERTIES_PLUGIN_DIR . 'templates/property-card.php';
+
+                include INMOVILLA_PROPERTIES_TEMPLATES_DIR . 'property-card.php';
+
                 $html .= ob_get_clean();
             }
-            
+
             wp_send_json_success(array(
-                'html' => $html,
-                'total' => count($properties),
-                'page' => $page,
-                'has_more' => count($properties) === $limit,
-                'search_summary' => $this->generate_search_summary($search_params, count($properties))
+                'html'           => $html,
+                'total'          => count($properties),
+                'page'           => $page,
+                'has_more'       => count($properties) === $limit,
+                'search_summary' => $this->generate_search_summary($search_params, count($properties)),
             ));
-            
         } catch (Exception $e) {
             wp_send_json_error(array(
                 'message' => __('Error en la búsqueda', 'inmovilla-properties'),
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage(),
             ));
         }
     }
@@ -145,16 +149,22 @@ class Inmovilla_Ajax {
         check_ajax_referer('inmovilla_public_nonce', 'nonce');
         
         try {
-            $api = new Inmovilla_API();
-            $cities = $api->get_cities();
-            
+            $api    = new InmovillaAPI();
+            $result = $api->request('cities');
+
+            if (is_wp_error($result) || empty($result['data'])) {
+                wp_send_json_error(array(
+                    'message' => __('Error al obtener las ciudades', 'inmovilla-properties'),
+                ));
+            }
+
             wp_send_json_success(array(
-                'cities' => $cities
+                'cities' => $result['data'],
             ));
-            
         } catch (Exception $e) {
             wp_send_json_error(array(
-                'message' => __('Error al obtener las ciudades', 'inmovilla-properties')
+                'message' => __('Error al obtener las ciudades', 'inmovilla-properties'),
+                'error'   => $e->getMessage(),
             ));
         }
     }
@@ -172,7 +182,7 @@ class Inmovilla_Ajax {
         }
         
         try {
-            $api = new Inmovilla_API();
+            $api  = new InmovillaAPI();
             $test = $api->test_connection();
             
             if ($test['success']) {
@@ -207,21 +217,16 @@ class Inmovilla_Ajax {
         }
         
         try {
-            $api = new Inmovilla_API();
-            $result = $api->sync_all_properties();
-            
+            $manager = new Inmovilla_Properties_Manager();
+            $manager->sync_properties();
+
             wp_send_json_success(array(
-                'message' => sprintf(
-                    __('Sincronización completada. %d propiedades procesadas.', 'inmovilla-properties'),
-                    $result['processed'] ?? 0
-                ),
-                'data' => $result
+                'message' => __('Sincronización completada.', 'inmovilla-properties'),
             ));
-            
         } catch (Exception $e) {
             wp_send_json_error(array(
                 'message' => __('Error durante la sincronización', 'inmovilla-properties'),
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage(),
             ));
         }
     }
