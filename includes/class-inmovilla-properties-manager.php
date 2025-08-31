@@ -98,13 +98,13 @@ class Inmovilla_Properties_Manager {
         // Guardamos todos los datos de la propiedad como campos personalizados
         if ($post_id && !is_wp_error($post_id)) {
             update_post_meta($post_id, '_inmovilla_id', $inmovilla_id); // ID único de Inmovilla
-            update_post_meta($post_id, 'price', $data['price'] ?? '');
-            update_post_meta($post_id, 'reference', $data['reference'] ?? '');
-            update_post_meta($post_id, 'bedrooms', $data['bedrooms'] ?? '');
-            update_post_meta($post_id, 'bathrooms', $data['bathrooms'] ?? '');
-            update_post_meta($post_id, 'size', $data['size'] ?? '');
-            update_post_meta($post_id, 'featured', $data['featured'] ?? false);
-            update_post_meta($post_id, 'property_type', $data['type'] ?? '');
+            update_post_meta($post_id, 'price', isset($data['price']) ? floatval($data['price']) : '');
+            update_post_meta($post_id, 'reference', isset($data['reference']) ? sanitize_text_field($data['reference']) : '');
+            update_post_meta($post_id, 'bedrooms', isset($data['bedrooms']) ? intval($data['bedrooms']) : '');
+            update_post_meta($post_id, 'bathrooms', isset($data['bathrooms']) ? intval($data['bathrooms']) : '');
+            update_post_meta($post_id, 'size', isset($data['size']) ? floatval($data['size']) : '');
+            update_post_meta($post_id, 'featured', !empty($data['featured']) ? 1 : 0);
+            update_post_meta($post_id, 'property_type', isset($data['type']) ? sanitize_text_field($data['type']) : '');
             
             // Guardamos la galería de imágenes (como un array)
             if (!empty($data['images'])) {
@@ -126,7 +126,20 @@ class Inmovilla_Properties_Manager {
                 $this->save_meta_recursive($post_id, "{$key}_{$sub_key}", $sub_value);
             }
         } else {
-            update_post_meta($post_id, sanitize_key($key), $value);
+            $sanitized_key = sanitize_key($key);
+
+            $float_fields = array('price', 'size', 'latitude', 'longitude');
+            $int_fields   = array('bedrooms', 'bathrooms');
+
+            if (in_array($sanitized_key, $float_fields, true)) {
+                $sanitized_value = floatval($value);
+            } elseif (in_array($sanitized_key, $int_fields, true)) {
+                $sanitized_value = intval($value);
+            } else {
+                $sanitized_value = sanitize_text_field($value);
+            }
+
+            update_post_meta($post_id, $sanitized_key, $sanitized_value);
         }
     }
 
