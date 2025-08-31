@@ -18,7 +18,9 @@ class Inmovilla_Properties_Manager {
         add_action('inmovilla_sync_properties', array($this, 'sync_properties'));
 
         if (!wp_next_scheduled('inmovilla_sync_properties')) {
-            wp_schedule_event(time(), 'hourly', 'inmovilla_sync_properties');
+            $settings = get_option('inmovilla_properties_settings', array());
+            $interval = $settings['schedule_interval'] ?? 'hourly';
+            wp_schedule_event(time(), $interval, 'inmovilla_sync_properties');
         }
         
         // Ya no controlamos los templates desde aquí, lo hará Elementor o el tema.

@@ -79,14 +79,31 @@ class InmovillaAdmin {
                             <label for="properties_per_page"><?php _e('Propiedades por página', 'inmovilla-properties'); ?></label>
                         </th>
                         <td>
-                            <input 
-                                type="number" 
-                                id="properties_per_page" 
-                                name="inmovilla_properties_settings[properties_per_page]" 
-                                value="<?php echo esc_attr($settings['properties_per_page'] ?? 12); ?>" 
-                                min="1" 
+                            <input
+                                type="number"
+                                id="properties_per_page"
+                                name="inmovilla_properties_settings[properties_per_page]"
+                                value="<?php echo esc_attr($settings['properties_per_page'] ?? 12); ?>"
+                                min="1"
                                 max="50"
                             />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">
+                            <label for="schedule_interval"><?php _e('Intervalo de sincronización', 'inmovilla-properties'); ?></label>
+                        </th>
+                        <td>
+                            <select id="schedule_interval" name="inmovilla_properties_settings[schedule_interval]">
+                                <?php
+                                $schedules = wp_get_schedules();
+                                $current_interval = $settings['schedule_interval'] ?? 'hourly';
+                                foreach ($schedules as $key => $schedule) {
+                                    echo '<option value="' . esc_attr($key) . '"' . selected($current_interval, $key, false) . '>' . esc_html($schedule['display']) . '</option>';
+                                }
+                                ?>
+                            </select>
                         </td>
                     </tr>
 

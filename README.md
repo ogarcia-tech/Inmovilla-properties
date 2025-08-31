@@ -68,6 +68,10 @@ Propiedades destacadas.
 3. En WordPress: Ajustes → Inmovilla Properties
 4. Pegar el token y guardar
 
+## Sincronización
+
+El proceso de sincronización se ejecuta de forma periódica mediante WP-Cron. Cada ejecución procesa 20 propiedades; por ejemplo, seis ejecuciones consecutivas importarán unas 120 propiedades.
+
 ## URLs SEO
 
 El plugin genera URLs amigables automáticamente:
