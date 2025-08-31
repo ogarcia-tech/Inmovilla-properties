@@ -169,6 +169,25 @@ get_header(); ?>
                 <h3><?php _e('Propiedades similares', 'inmovilla-properties'); ?></h3>
                 <?php echo do_shortcode('[inmovilla_properties limit="4" type="' . ($property['type'] ?? '') . '" location="' . ($property['location']['city'] ?? '') . '"]'); ?>
             </div>
+
+            <?php
+            $agency_contact = inmovilla_get_setting('agency_contact');
+            $legal_note = inmovilla_get_setting('legal_note');
+            if ($agency_contact || $legal_note): ?>
+                <div class="property-extra-info">
+                    <?php if ($agency_contact): ?>
+                        <div class="agency-contact">
+                            <?php echo wp_kses_post($agency_contact); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if ($legal_note): ?>
+                        <div class="legal-note">
+                            <?php echo wp_kses_post($legal_note); ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

@@ -335,6 +335,20 @@
     margin-top: 5px;
 }
 
+/* Información adicional de la propiedad */
+.property-extra-info {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--inmovilla-border);
+    font-size: 14px;
+    color: #666;
+}
+
+.property-extra-info .agency-contact,
+.property-extra-info .legal-note {
+    margin-bottom: 15px;
+}
+
 /* ===================================
    PAGINACIÓN
 =================================== */

@@ -112,13 +112,47 @@ class InmovillaAdmin {
                             <label for="primary_color"><?php _e('Color primario', 'inmovilla-properties'); ?></label>
                         </th>
                         <td>
-                            <input 
-                                type="text" 
-                                id="primary_color" 
-                                name="inmovilla_properties_settings[primary_color]" 
-                                value="<?php echo esc_attr($settings['primary_color'] ?? '#2196F3'); ?>" 
+                            <input
+                                type="text"
+                                id="primary_color"
+                                name="inmovilla_properties_settings[primary_color]"
+                                value="<?php echo esc_attr($settings['primary_color'] ?? '#2196F3'); ?>"
                                 class="color-picker"
                             />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">
+                            <label for="agency_contact"><?php _e('Contacto de la agencia', 'inmovilla-properties'); ?></label>
+                        </th>
+                        <td>
+                            <textarea
+                                id="agency_contact"
+                                name="inmovilla_properties_settings[agency_contact]"
+                                rows="3"
+                                class="large-text"
+                            ><?php echo esc_textarea($settings['agency_contact'] ?? ''); ?></textarea>
+                            <p class="description">
+                                <?php _e('Información de contacto que se mostrará en la ficha de propiedad.', 'inmovilla-properties'); ?>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">
+                            <label for="legal_note"><?php _e('Nota legal', 'inmovilla-properties'); ?></label>
+                        </th>
+                        <td>
+                            <textarea
+                                id="legal_note"
+                                name="inmovilla_properties_settings[legal_note]"
+                                rows="3"
+                                class="large-text"
+                            ><?php echo esc_textarea($settings['legal_note'] ?? ''); ?></textarea>
+                            <p class="description">
+                                <?php _e('Texto legal que aparecerá al final de la ficha de propiedad.', 'inmovilla-properties'); ?>
+                            </p>
                         </td>
                     </tr>
                 </table>
