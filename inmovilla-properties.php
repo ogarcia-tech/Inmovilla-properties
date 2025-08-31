@@ -84,6 +84,7 @@ final class InmovillaProperties {
 
     public function on_plugins_loaded() {
         load_plugin_textdomain('inmovilla-properties', false, dirname(plugin_basename(INMOVILLA_PROPERTIES_PLUGIN_FILE)) . '/languages/');
+        $this->register_post_types_and_taxonomies();
         new Inmovilla_Properties_Manager();
         new InmovillaShortcodes();
         new InmovillaSEO();

@@ -24,12 +24,10 @@ class InmovillaAPI {
      */
     public function request($endpoint, $params = array()) {
         
-        // --- INICIO DE LA MODIFICACIÓN PARA PRUEBAS ---
-        // Si el modo debug de WordPress está activo y se piden propiedades, devuelve datos de prueba.
-        if (defined('WP_DEBUG') && WP_DEBUG === true && $endpoint === 'properties') {
-            return $this->get_mock_properties();
+        $mock = $this->get_mock_properties($endpoint);
+        if (false !== $mock) {
+            return $mock;
         }
-        // --- FIN DE LA MODIFICACIÓN ---
 
         if (empty($this->api_token)) {
             return new WP_Error('no_token', __('Token de API no configurado', 'inmovilla-properties'));
@@ -67,10 +65,25 @@ class InmovillaAPI {
     }
     
     /**
-     * Devuelve un array de propiedades de prueba para evaluar el diseño.
+     * Obtiene datos ficticios de propiedades si está habilitado.
+     *
+     * @param string $endpoint Endpoint solicitado.
+     * @return array|false
+     */
+    private function get_mock_properties($endpoint) {
+        if ($endpoint !== 'properties' || !apply_filters('inmovilla_mock_data', false)) {
+            return false;
+        }
+
+        return $this->mock_properties_data();
+    }
+
+    /**
+     * Datos ficticios de propiedades para evaluar el diseño.
+     *
      * @return array
      */
-    private function get_mock_properties() {
+    private function mock_properties_data() {
         return array(
             'data' => array(
                 array(
@@ -101,7 +114,7 @@ class InmovillaAPI {
                     'reference' => 'REF-002',
                     'type' => 'Chalet'
                 ),
-                 array(
+                array(
                     'id' => 3,
                     'title' => 'Ático con Vistas al Mar',
                     'price' => 620000,
@@ -119,7 +132,6 @@ class InmovillaAPI {
             'pagination' => '<a href="#">1</a><span class="current">2</span><a href="#">3</a>'
         );
     }
-
 
     /**
      * Obtener propiedades
@@ -140,5 +152,84 @@ class InmovillaAPI {
      */
     public function test_connection() {
         return $this->request('test');
+    }
+
+    /**
+     * Buscar propiedades según parámetros.
+     *
+     * @param array $params Parámetros de búsqueda.
+     * @return array|WP_Error
+     */
+    public function search_properties($params = array()) {
+        $response = $this->request('properties/search', $params);
+
+        if (is_wp_error($response)) {
+            return $response;
+        }
+
+        if (!is_array($response)) {
+            return new WP_Error('invalid_response', __('Respuesta inválida de la API', 'inmovilla-properties'));
+        }
+
+        return $response;
+    }
+
+    /**
+     * Obtener tipos de propiedad disponibles.
+     *
+     * @return array|WP_Error
+     */
+    public function get_property_types() {
+        $response = $this->request('properties/types');
+
+        if (is_wp_error($response)) {
+            return $response;
+        }
+
+        if (!is_array($response)) {
+            return new WP_Error('invalid_response', __('Respuesta inválida de la API', 'inmovilla-properties'));
+        }
+
+        return $response;
+    }
+
+    /**
+     * Obtener listado de ciudades.
+     *
+     * @return array|WP_Error
+     */
+    public function get_cities() {
+        $response = $this->request('locations/cities');
+
+        if (is_wp_error($response)) {
+            return $response;
+        }
+
+        if (!is_array($response)) {
+            return new WP_Error('invalid_response', __('Respuesta inválida de la API', 'inmovilla-properties'));
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sincronizar todas las propiedades.
+     *
+     * Utilizado principalmente para peticiones AJAX.
+     *
+     * @return array|WP_Error
+     */
+    public function sync_all_properties() {
+        $response = $this->request('properties/sync');
+
+        if (is_wp_error($response)) {
+            return $response;
+        }
+
+        if (!is_array($response)) {
+            return new WP_Error('invalid_response', __('Respuesta inválida de la API', 'inmovilla-properties'));
+        }
+
+        return $response;
     }
 }

@@ -18,7 +18,9 @@ class Inmovilla_Properties_Manager {
         add_action('inmovilla_sync_properties', array($this, 'sync_properties'));
 
         if (!wp_next_scheduled('inmovilla_sync_properties')) {
-            wp_schedule_event(time(), 'hourly', 'inmovilla_sync_properties');
+            $settings = get_option('inmovilla_properties_settings', array());
+            $interval = $settings['schedule_interval'] ?? 'hourly';
+            wp_schedule_event(time(), $interval, 'inmovilla_sync_properties');
         }
         
         // Ya no controlamos los templates desde aquí, lo hará Elementor o el tema.
@@ -103,12 +105,6 @@ class Inmovilla_Properties_Manager {
             update_post_meta($post_id, 'size', $data['size'] ?? '');
             update_post_meta($post_id, 'featured', $data['featured'] ?? false);
             update_post_meta($post_id, 'property_type', $data['type'] ?? '');
-
-            // Guardamos datos de ubicación
-            if (!empty($data['location'])) {
-                update_post_meta($post_id, 'location_city', $data['location']['city'] ?? '');
-                update_post_meta($post_id, 'location_district', $data['location']['district'] ?? '');
-            }
             
             // Guardamos la galería de imágenes (como un array)
             if (!empty($data['images'])) {
@@ -116,9 +112,24 @@ class Inmovilla_Properties_Manager {
                 // Establecemos la primera imagen como imagen destacada del post
                 set_post_thumbnail_from_url($post_id, $data['images'][0]['url']);
             }
+
+            // Guardamos cualquier otro dato como metadato
+            foreach ($data as $key => $value) {
+                $this->save_meta_recursive($post_id, $key, $value);
+            }
         }
     }
-    
+
+    private function save_meta_recursive($post_id, $key, $value) {
+        if (is_array($value)) {
+            foreach ($value as $sub_key => $sub_value) {
+                $this->save_meta_recursive($post_id, "{$key}_{$sub_key}", $sub_value);
+            }
+        } else {
+            update_post_meta($post_id, sanitize_key($key), $value);
+        }
+    }
+
     /**
      * Oculta (pone en borrador) las propiedades que ya no existen en la API de Inmovilla.
      */
@@ -140,6 +151,126 @@ class Inmovilla_Properties_Manager {
             $old_property->post_status = 'draft';
             wp_update_post($old_property);
         }
+    }
+
+    /**
+     * Obtener la URL del post asociado a la propiedad.
+     *
+     * @param array|WP_Post|int $property Datos de la propiedad o ID del post
+     * @return string
+     */
+    public function get_property_url($property) {
+        $post_id = $this->get_property_post_id($property);
+
+        if (!$post_id) {
+            return '';
+        }
+
+        return get_permalink($post_id);
+    }
+
+    /**
+     * Obtener la imagen destacada de la propiedad.
+     *
+     * @param array|WP_Post|int $property Datos de la propiedad o ID del post
+     * @return string
+     */
+    public function get_property_featured_image($property) {
+        $post_id = $this->get_property_post_id($property);
+
+        if (!$post_id) {
+            return '';
+        }
+
+        return get_the_post_thumbnail_url($post_id);
+    }
+
+    /**
+     * Obtener la galería de imágenes de la propiedad.
+     *
+     * @param array|WP_Post|int $property Datos de la propiedad o ID del post
+     * @return array
+     */
+    public function get_property_gallery($property) {
+        $post_id = $this->get_property_post_id($property);
+
+        if (!$post_id) {
+            return array();
+        }
+
+        $images = get_post_meta($post_id, 'gallery_images', true);
+
+        if (empty($images) || !is_array($images)) {
+            return array();
+        }
+
+        $gallery = array();
+
+        foreach ($images as $image) {
+            if (is_array($image) && !empty($image['url'])) {
+                $gallery[] = array('url' => esc_url($image['url']));
+            } elseif (is_string($image)) {
+                $gallery[] = array('url' => esc_url($image));
+            }
+        }
+
+        return $gallery;
+    }
+
+    /**
+     * Formatear precio para mostrar.
+     *
+     * @param mixed $price Precio numérico
+     * @return string
+     */
+    public function format_price($price) {
+        if (empty($price) || !is_numeric($price)) {
+            return __('Consultar precio', 'inmovilla-properties');
+        }
+
+        return number_format((float) $price, 0, ',', '.') . ' €';
+    }
+
+    /**
+     * Obtener el ID del post asociado a una propiedad.
+     *
+     * @param array|WP_Post|int $property Datos de la propiedad o ID del post
+     * @return int
+     */
+    private function get_property_post_id($property) {
+        if (is_numeric($property)) {
+            return absint($property);
+        }
+
+        if ($property instanceof WP_Post) {
+            return $property->ID;
+        }
+
+        if (is_array($property)) {
+            if (!empty($property['post_id'])) {
+                return intval($property['post_id']);
+            }
+
+            if (!empty($property['ID'])) {
+                return intval($property['ID']);
+            }
+
+            if (!empty($property['id'])) {
+                $posts = get_posts(array(
+                    'post_type'      => 'inmovilla_property',
+                    'meta_key'       => '_inmovilla_id',
+                    'meta_value'     => $property['id'],
+                    'fields'         => 'ids',
+                    'posts_per_page' => 1,
+                ));
+
+                if (!empty($posts)) {
+                    return intval($posts[0]);
+                }
+            }
+        }
+
+        return 0;
     }
 }
 
