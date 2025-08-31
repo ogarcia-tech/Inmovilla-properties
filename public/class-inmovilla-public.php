@@ -65,9 +65,9 @@ class Inmovilla_Public {
      * Añadir estilos personalizados desde la configuración
      */
     public function add_custom_styles() {
-        $options = get_option('inmovilla_properties_options', array());
-        $primary_color = $options['primary_color'] ?? '#2563eb';
-        $secondary_color = $options['secondary_color'] ?? '#64748b';
+        $settings = get_option('inmovilla_properties_settings', array());
+        $primary_color = $settings['primary_color'] ?? '#2563eb';
+        $secondary_color = $settings['secondary_color'] ?? '#64748b';
         
         echo "<style type='text/css'>
             :root {
