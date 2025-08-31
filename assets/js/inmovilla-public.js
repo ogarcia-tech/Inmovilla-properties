@@ -61,6 +61,7 @@
                 $('.inmovilla-mobile-menu').slideToggle();
             });
 
+
             // Abrir formulario de contacto
             $(document).on('click', '.inmovilla-contact-btn', function(e) {
                 e.preventDefault();
@@ -89,6 +90,7 @@
                         InmovillaPublic.showNotification(response.data.message, 'error');
                     }
                 });
+
             });
         },
 

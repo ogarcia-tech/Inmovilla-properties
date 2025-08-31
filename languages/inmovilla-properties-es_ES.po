@@ -60,6 +60,7 @@ msgstr "Ver detalles"
 msgid "Contactar"
 msgstr "Contactar"
 
+
 #: templates/property-single.php:97
 msgid "Hacer una oferta"
 msgstr "Hacer una oferta"
@@ -119,3 +120,4 @@ msgstr "Solicitud enviada correctamente."
 #: public/class-inmovilla-ajax.php:195
 msgid "Error al enviar la solicitud."
 msgstr "Error al enviar la solicitud."
+
