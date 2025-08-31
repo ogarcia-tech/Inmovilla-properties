@@ -141,6 +141,7 @@ get_header(); ?>
                                 </div>
                             <?php endif; ?>
 
+
                             <?php if (!empty($property['orientation'])): ?>
                                 <div class="feature-item">
                                     <span class="feature-label"><?php _e('Orientación:', 'inmovilla-properties'); ?></span>
@@ -231,7 +232,37 @@ get_header(); ?>
                                 </div>
                             <?php endif; ?>
                         </div>
+
                     </div>
+                </div>
+
+                    <?php if (!empty($property['energy_rating']) || !empty($property['energy_consumption']) || !empty($property['co2_emissions'])): ?>
+                        <div class="property-energy">
+                            <h3><?php _e('Eficiencia energética', 'inmovilla-properties'); ?></h3>
+                            <div class="energy-grid">
+                                <?php if (!empty($property['energy_rating'])): ?>
+                                    <div class="energy-item">
+                                        <span class="energy-label"><?php _e('Certificación energética:', 'inmovilla-properties'); ?></span>
+                                        <span class="energy-value"><?php echo esc_html($property['energy_rating']); ?></span>
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($property['energy_consumption'])): ?>
+                                    <div class="energy-item">
+                                        <span class="energy-label"><?php _e('Consumo de energía:', 'inmovilla-properties'); ?></span>
+                                        <span class="energy-value"><?php echo esc_html($property['energy_consumption']); ?> kWh/m²</span>
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($property['co2_emissions'])): ?>
+                                    <div class="energy-item">
+                                        <span class="energy-label"><?php _e('Emisiones CO₂:', 'inmovilla-properties'); ?></span>
+                                        <span class="energy-value"><?php echo esc_html($property['co2_emissions']); ?> kg CO₂/m²</span>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
 
                     <?php if (!empty($property['description'])): ?>
                         <div class="property-description">
