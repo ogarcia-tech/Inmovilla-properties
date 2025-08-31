@@ -41,17 +41,50 @@ class InmovillaSitemap {
 
         header('Content-Type: application/xml; charset=utf-8');
 
-        echo '<?xml version="1.0" encoding="UTF-8"?>';
-        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+        // Intenta obtener el sitemap desde la caché
+        $sitemap = get_transient('inmovilla_sitemap');
 
-        // Aquí iría la lógica para generar URLs de propiedades
-        echo '<url>';
-        echo '<loc>' . home_url('/propiedades/') . '</loc>';
-        echo '<changefreq>daily</changefreq>';
-        echo '<priority>1.0</priority>';
-        echo '</url>';
+        if (false === $sitemap) {
+            $sitemap  = '<?xml version="1.0" encoding="UTF-8"?>';
+            $sitemap .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
-        echo '</urlset>';
+            $args = array(
+                'post_type'      => 'inmovilla_property',
+                'post_status'    => 'publish',
+                'posts_per_page' => 200,
+                'orderby'        => 'date',
+                'order'          => 'DESC',
+                'fields'         => 'ids',
+            );
+
+            $query       = new WP_Query($args);
+            $total_pages = $query->max_num_pages;
+
+            for ($page = 1; $page <= $total_pages; $page++) {
+                if ($page > 1) {
+                    $args['paged'] = $page;
+                    $query         = new WP_Query($args);
+                }
+
+                foreach ($query->posts as $post_id) {
+                    $sitemap .= '<url>';
+                    $sitemap .= '<loc>' . esc_url(get_permalink($post_id)) . '</loc>';
+                    $sitemap .= '<lastmod>' . esc_html(get_post_modified_time('c', true, $post_id)) . '</lastmod>';
+                    $sitemap .= '<changefreq>daily</changefreq>';
+                    $sitemap .= '<priority>0.8</priority>';
+                    $sitemap .= '</url>';
+                }
+            }
+
+            wp_reset_postdata();
+
+            $sitemap .= '</urlset>';
+
+            // Cachea el resultado por 12 horas
+            set_transient('inmovilla_sitemap', $sitemap, 12 * HOUR_IN_SECONDS);
+        }
+
+        echo $sitemap;
         exit;
     }
 }
