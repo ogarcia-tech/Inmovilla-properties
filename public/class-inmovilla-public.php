@@ -117,35 +117,28 @@ class Inmovilla_Public {
      * Verificar si estamos en una página de Inmovilla
      */
     private function is_inmovilla_page() {
-        global $wp_query;
-        
-        if (isset($wp_query->query_vars['inmovilla_properties'])) {
-            return true;
-        }
-        
-        if (isset($wp_query->query_vars['inmovilla_property'])) {
-            return true;
-        }
-        
-        return false;
+        $inmovilla_page = get_query_var('inmovilla_page');
+
+        return !empty($inmovilla_page);
     }
     
     /**
      * Añadir schema markup para SEO
      */
     public function add_schema_markup() {
-        if (!$this->is_inmovilla_page()) {
+        $inmovilla_page = get_query_var('inmovilla_page');
+
+        if (empty($inmovilla_page)) {
             return;
         }
-        
-        global $wp_query;
-        
-        if (isset($wp_query->query_vars['inmovilla_property'])) {
-            $this->add_property_schema();
-        }
-        
-        if (isset($wp_query->query_vars['inmovilla_properties'])) {
-            $this->add_properties_list_schema();
+
+        switch ($inmovilla_page) {
+            case 'single':
+                $this->add_property_schema();
+                break;
+            case 'list':
+                $this->add_properties_list_schema();
+                break;
         }
     }
     
