@@ -11,12 +11,16 @@ class InmovillaAPI {
 
     private $api_token;
     private $api_url;
+    /** @var InmovillaCache|null */
     private $cache;
 
     public function __construct() {
         $this->api_token = inmovilla_get_setting('api_token');
-        $this->api_url = inmovilla_get_setting('api_url', 'https://crm.inmovilla.com/api/');
-        $this->cache = inmovilla_get_setting('cache_enabled', true);
+        $this->api_url  = inmovilla_get_setting('api_url', 'https://crm.inmovilla.com/api/');
+
+        $this->cache = inmovilla_get_setting('cache_enabled', true)
+            ? new InmovillaCache()
+            : null;
     }
 
     /**
@@ -31,6 +35,12 @@ class InmovillaAPI {
 
         if (empty($this->api_token)) {
             return new WP_Error('no_token', __('Token de API no configurado', 'inmovilla-properties'));
+        }
+
+        $cache_key = $this->get_cache_key($endpoint, $params);
+        $cached    = $this->get_cached_response($cache_key);
+        if (false !== $cached) {
+            return $cached;
         }
 
         $url = rtrim($this->api_url, '/') . '/' . ltrim($endpoint, '/');
@@ -61,7 +71,53 @@ class InmovillaAPI {
             return new WP_Error('json_error', __('Error al decodificar respuesta de API', 'inmovilla-properties'));
         }
 
+        $this->set_cached_response($cache_key, $data);
+
         return $data;
+    }
+
+    /**
+     * Generar clave única para el caché.
+     *
+     * @param string $endpoint
+     * @param array  $params
+     * @return string
+     */
+    private function get_cache_key($endpoint, $params = array()) {
+        if (empty($params)) {
+            return $endpoint;
+        }
+
+        return $endpoint . ':' . md5(wp_json_encode($params));
+    }
+
+    /**
+     * Leer respuesta cacheada si existe.
+     *
+     * @param string $cache_key
+     * @return mixed
+     */
+    private function get_cached_response($cache_key) {
+        if (!$this->cache) {
+            return false;
+        }
+
+        return $this->cache->get($cache_key);
+    }
+
+    /**
+     * Almacenar respuesta en caché.
+     *
+     * @param string $cache_key
+     * @param mixed  $data
+     * @return void
+     */
+    private function set_cached_response($cache_key, $data) {
+        if (!$this->cache) {
+            return;
+        }
+
+        $this->cache->set($cache_key, $data);
     }
     
     /**
