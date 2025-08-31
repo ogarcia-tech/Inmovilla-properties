@@ -59,3 +59,19 @@ msgstr "Ver detalles"
 #: templates/property-card.php:127
 msgid "Contactar"
 msgstr "Contactar"
+
+#: templates/property-single.php:150
+msgid "Eficiencia energética"
+msgstr "Eficiencia energética"
+
+#: templates/property-single.php:153
+msgid "Certificación energética:"
+msgstr "Certificación energética:"
+
+#: templates/property-single.php:158
+msgid "Consumo de energía:"
+msgstr "Consumo de energía:"
+
+#: templates/property-single.php:163
+msgid "Emisiones CO₂:"
+msgstr "Emisiones CO₂:"
