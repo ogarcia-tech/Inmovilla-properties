@@ -10,14 +10,21 @@ if (!defined('ABSPATH')) {
 }
 
 // Obtener configuración
+$atts = isset($atts) && is_array($atts) ? $atts : array();
 $style = $atts['style'] ?? 'horizontal';
-$fields = isset($atts['fields']) ? explode(',', $atts['fields']) : array('type', 'city', 'price', 'bedrooms');
+$fields = !empty($atts['fields']) ? explode(',', $atts['fields']) : array('type', 'city', 'price', 'bedrooms');
 $fields = array_map('trim', $fields);
 
 // Obtener datos para los campos
 $api = new Inmovilla_API();
 $property_types = $api->get_property_types();
+if (is_wp_error($property_types) || empty($property_types) || !is_array($property_types)) {
+    $property_types = array();
+}
 $cities = $api->get_cities();
+if (is_wp_error($cities) || empty($cities) || !is_array($cities)) {
+    $cities = array();
+}
 ?>
 
 <form class="inmovilla-search-form inmovilla-search-" method="get" id="inmovilla-search-form">
@@ -31,11 +38,13 @@ $cities = $api->get_cities();
                 <label for="property-type"><?php _e('Tipo', 'inmovilla-properties'); ?></label>
                 <select name="type" id="property-type" class="form-control">
                     <option value=""><?php _e('Cualquier tipo', 'inmovilla-properties'); ?></option>
-                    <?php if (!empty($property_types['data'])): foreach ($property_types['data'] as $type): ?>
-                        <option value="<?php echo esc_attr($type['value']); ?>" 
-                                <?php selected($_GET['type'] ?? '', $type['value']); ?>>
-                            <?php echo esc_html($type['label']); ?>
-                        </option>
+                    <?php if (!empty($property_types)): foreach ($property_types as $type): ?>
+                        <?php if (isset($type['value'], $type['label'])): ?>
+                            <option value="<?php echo esc_attr($type['value']); ?>"
+                                    <?php selected($_GET['type'] ?? '', $type['value']); ?>>
+                                <?php echo esc_html($type['label']); ?>
+                            </option>
+                        <?php endif; ?>
                     <?php endforeach; endif; ?>
                 </select>
             </div>
@@ -46,8 +55,8 @@ $cities = $api->get_cities();
                 <label for="property-city"><?php _e('Ciudad', 'inmovilla-properties'); ?></label>
                 <select name="city" id="property-city" class="form-control">
                     <option value=""><?php _e('Cualquier ciudad', 'inmovilla-properties'); ?></option>
-                    <?php if (!empty($cities['data'])): foreach ($cities['data'] as $city): ?>
-                        <option value="<?php echo esc_attr($city); ?>" 
+                    <?php if (!empty($cities)): foreach ($cities as $city): ?>
+                        <option value="<?php echo esc_attr($city); ?>"
                                 <?php selected($_GET['city'] ?? '', $city); ?>>
                             <?php echo esc_html($city); ?>
                         </option>
