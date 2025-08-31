@@ -183,7 +183,7 @@ class Inmovilla_Ajax {
         
         try {
 
-            $api = new Inmovilla_API();
+            $api = new InmovillaAPI();
             $response = $api->test_connection();
 
             if (is_wp_error($response)) {
