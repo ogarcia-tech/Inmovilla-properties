@@ -23,6 +23,13 @@ class InmovillaAPI {
      * Realizar petición a la API
      */
     public function request($endpoint, $params = array()) {
+        
+        // --- INICIO DE LA MODIFICACIÓN PARA PRUEBAS ---
+        // Si el modo debug de WordPress está activo y se piden propiedades, devuelve datos de prueba.
+        if (defined('WP_DEBUG') && WP_DEBUG === true && $endpoint === 'properties') {
+            return $this->get_mock_properties();
+        }
+        // --- FIN DE LA MODIFICACIÓN ---
 
         if (empty($this->api_token)) {
             return new WP_Error('no_token', __('Token de API no configurado', 'inmovilla-properties'));
@@ -35,7 +42,7 @@ class InmovillaAPI {
                 'Authorization' => 'Bearer ' . $this->api_token,
                 'Content-Type' => 'application/json',
             ),
-            'timeout' => 30,
+            'timeout' => 60, // Timeout aumentado a 60 segundos
         );
 
         if (!empty($params)) {
@@ -58,6 +65,61 @@ class InmovillaAPI {
 
         return $data;
     }
+    
+    /**
+     * Devuelve un array de propiedades de prueba para evaluar el diseño.
+     * @return array
+     */
+    private function get_mock_properties() {
+        return array(
+            'data' => array(
+                array(
+                    'id' => 1,
+                    'title' => 'Piso de Lujo en el Centro',
+                    'price' => 450000,
+                    'location' => array('city' => 'Madrid', 'district' => 'Salamanca'),
+                    'description' => 'Un increíble piso con acabados de lujo, muy luminoso y en una de las mejores zonas de la ciudad.',
+                    'bedrooms' => 3,
+                    'bathrooms' => 2,
+                    'size' => 120,
+                    'featured' => true,
+                    'images' => array(array('url' => 'https://via.placeholder.com/800x600.png?text=Propiedad+1')),
+                    'reference' => 'REF-001',
+                    'type' => 'Piso'
+                ),
+                array(
+                    'id' => 2,
+                    'title' => 'Chalet con Piscina y Jardín',
+                    'price' => 780000,
+                    'location' => array('city' => 'Barcelona', 'district' => 'Sarrià'),
+                    'description' => 'Espectacular chalet con un gran jardín y piscina privada. Ideal para familias.',
+                    'bedrooms' => 5,
+                    'bathrooms' => 4,
+                    'size' => 350,
+                    'featured' => false,
+                    'images' => array(array('url' => 'https://via.placeholder.com/800x600.png?text=Propiedad+2')),
+                    'reference' => 'REF-002',
+                    'type' => 'Chalet'
+                ),
+                 array(
+                    'id' => 3,
+                    'title' => 'Ático con Vistas al Mar',
+                    'price' => 620000,
+                    'location' => array('city' => 'Valencia', 'district' => 'Playa de la Malvarrosa'),
+                    'description' => 'Disfruta de unas vistas inmejorables desde la terraza de este maravilloso ático.',
+                    'bedrooms' => 2,
+                    'bathrooms' => 2,
+                    'size' => 95,
+                    'featured' => true,
+                    'images' => array(array('url' => 'https://via.placeholder.com/800x600.png?text=Propiedad+3')),
+                    'reference' => 'REF-003',
+                    'type' => 'Ático'
+                )
+            ),
+            'pagination' => '<a href="#">1</a><span class="current">2</span><a href="#">3</a>'
+        );
+    }
+
 
     /**
      * Obtener propiedades

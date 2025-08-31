@@ -7,10 +7,10 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Obtener estadísticas
-$api = new Inmovilla_API();
+// CORREGIDO: Llamadas a las clases con los nombres correctos
+$api = new InmovillaAPI();
 $stats = $api->get_stats();
-$sitemap = new Inmovilla_Sitemap();
+$sitemap = new InmovillaSitemap();
 $sitemap_stats = $sitemap->get_sitemap_stats();
 ?>
 
@@ -19,7 +19,6 @@ $sitemap_stats = $sitemap->get_sitemap_stats();
         <?php _e('Dashboard Inmovilla Properties', 'inmovilla-properties'); ?>
     </h1>
     
-    <!-- Estadísticas principales -->
     <div class="inmovilla-dashboard-stats">
         <div class="stats-grid">
             <div class="stat-card">
@@ -66,7 +65,6 @@ $sitemap_stats = $sitemap->get_sitemap_stats();
     
     <div class="inmovilla-dashboard-content">
         <div class="dashboard-row">
-            <!-- Estado de la API -->
             <div class="dashboard-col-6">
                 <div class="postbox">
                     <h2 class="hndle">
@@ -98,7 +96,6 @@ $sitemap_stats = $sitemap->get_sitemap_stats();
                 </div>
             </div>
             
-            <!-- Acciones Rápidas -->
             <div class="dashboard-col-6">
                 <div class="postbox">
                     <h2 class="hndle">
@@ -134,7 +131,6 @@ $sitemap_stats = $sitemap->get_sitemap_stats();
             </div>
         </div>
         
-        <!-- Propiedades Recientes -->
         <div class="postbox">
             <h2 class="hndle">
                 <span><?php _e('Propiedades Recientes', 'inmovilla-properties'); ?></span>
@@ -146,7 +142,6 @@ $sitemap_stats = $sitemap->get_sitemap_stats();
             </div>
         </div>
         
-        <!-- Shortcodes Disponibles -->
         <div class="postbox">
             <h2 class="hndle">
                 <span><?php _e('Shortcodes Disponibles', 'inmovilla-properties'); ?></span>

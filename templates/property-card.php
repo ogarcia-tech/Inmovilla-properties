@@ -1,6 +1,7 @@
 <?php
 /**
  * Template para tarjeta de propiedad individual
+ * MEJORADO para traducciones y personalización
  */
 
 if (!defined('ABSPATH')) {
@@ -64,8 +65,7 @@ $price = !empty($property['price']) ? $properties_manager->format_price($propert
 
         <?php if (!empty($property['location'])): ?>
             <div class="inmovilla-card-location">
-                <span class="location-icon">📍</span>
-                <?php 
+                <i class="inmovilla-icon-location"></i> <?php 
                 $location_parts = array();
                 if (!empty($property['location']['city'])) {
                     $location_parts[] = $property['location']['city'];
@@ -86,23 +86,20 @@ $price = !empty($property['price']) ? $properties_manager->format_price($propert
 
         <div class="inmovilla-card-features">
             <?php if (!empty($property['bedrooms'])): ?>
-                <span class="feature">
-                    <span class="feature-icon">🛏️</span>
-                    <?php echo esc_html($property['bedrooms']); ?> <?php _e('hab.', 'inmovilla-properties'); ?>
+                <span class="feature feature-bedrooms">
+                    <i class="inmovilla-icon-bedrooms"></i> <?php printf(esc_html__('%s hab.', 'inmovilla-properties'), esc_html($property['bedrooms'])); ?>
                 </span>
             <?php endif; ?>
 
             <?php if (!empty($property['bathrooms'])): ?>
-                <span class="feature">
-                    <span class="feature-icon">🚿</span>
-                    <?php echo esc_html($property['bathrooms']); ?> <?php _e('baños', 'inmovilla-properties'); ?>
+                <span class="feature feature-bathrooms">
+                    <i class="inmovilla-icon-bathrooms"></i> <?php printf(esc_html__('%s baños', 'inmovilla-properties'), esc_html($property['bathrooms'])); ?>
                 </span>
             <?php endif; ?>
 
             <?php if (!empty($property['size'])): ?>
-                <span class="feature">
-                    <span class="feature-icon">📐</span>
-                    <?php echo esc_html($property['size']); ?> m²
+                <span class="feature feature-size">
+                    <i class="inmovilla-icon-size"></i> <?php printf(esc_html__('%s m²', 'inmovilla-properties'), esc_html($property['size'])); ?>
                 </span>
             <?php endif; ?>
         </div>

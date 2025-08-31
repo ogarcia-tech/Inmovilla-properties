@@ -1,6 +1,7 @@
 <?php
 /**
  * Gestión de propiedades desde Inmovilla
+ * MODIFICADO: Ahora guarda las propiedades como posts con sus campos personalizados (post meta).
  */
 
 if (!defined('ABSPATH')) {
@@ -10,315 +11,169 @@ if (!defined('ABSPATH')) {
 class Inmovilla_Properties_Manager {
 
     private $api;
-    private $cache;
 
     public function __construct() {
-        $this->api = new Inmovilla_API();
-        $this->cache = new Inmovilla_Cache();
-
-        // Hooks
-        add_action('init', array($this, 'init'));
+        $this->api = new InmovillaAPI();
+        
         add_action('inmovilla_sync_properties', array($this, 'sync_properties'));
 
-        // Programar sincronización automática
         if (!wp_next_scheduled('inmovilla_sync_properties')) {
             wp_schedule_event(time(), 'hourly', 'inmovilla_sync_properties');
         }
-    }
-
-    public function init() {
-        // Template redirect para URLs personalizadas
-        add_action('template_redirect', array($this, 'template_redirect'));
+        
+        // Ya no controlamos los templates desde aquí, lo hará Elementor o el tema.
     }
 
     /**
-     * Redirect para templates personalizados
-     */
-    public function template_redirect() {
-        global $wp_query;
-
-        if (get_query_var('inmovilla_property_slug')) {
-            $this->load_single_property_template();
-        } else if (get_query_var('inmovilla_search')) {
-            $this->load_search_template();
-        }
-    }
-
-    /**
-     * Cargar template de propiedad individual
-     */
-    private function load_single_property_template() {
-        $slug = get_query_var('inmovilla_property_slug');
-        $property = $this->get_property_by_slug($slug);
-
-        if (!$property) {
-            global $wp_query;
-            $wp_query->set_404();
-            status_header(404);
-            return;
-        }
-
-        // Cargar template
-        $template = locate_template('inmovilla/property-single.php');
-        if (!$template) {
-            $template = INMOVILLA_PLUGIN_PATH . 'templates/property-single.php';
-        }
-
-        global $inmovilla_property;
-        $inmovilla_property = $property;
-
-        include $template;
-        exit;
-    }
-
-    /**
-     * Cargar template de búsqueda
-     */
-    private function load_search_template() {
-        $template = locate_template('inmovilla/property-search.php');
-        if (!$template) {
-            $template = INMOVILLA_PLUGIN_PATH . 'templates/property-search.php';
-        }
-
-        include $template;
-        exit;
-    }
-
-    /**
-     * Obtener propiedades con caché
-     */
-    public function get_properties($params = array()) {
-        $cache_key = 'properties_' . md5(serialize($params));
-
-        // Intentar obtener del caché
-        $cached = $this->cache->get($cache_key);
-        if ($cached !== false) {
-            return $cached;
-        }
-
-        // Obtener de la API
-        $response = $this->api->get_properties($params);
-
-        if (is_wp_error($response)) {
-            return $response;
-        }
-
-        // Guardar en caché
-        $this->cache->set($cache_key, $response);
-
-        return $response;
-    }
-
-    /**
-     * Obtener propiedad por ID
-     */
-    public function get_property($property_id) {
-        $cache_key = 'property_' . $property_id;
-
-        // Intentar obtener del caché
-        $cached = $this->cache->get($cache_key);
-        if ($cached !== false) {
-            return $cached;
-        }
-
-        // Obtener de la API
-        $response = $this->api->get_property($property_id);
-
-        if (is_wp_error($response)) {
-            return $response;
-        }
-
-        // Guardar en caché
-        $this->cache->set($cache_key, $response);
-
-        return $response;
-    }
-
-    /**
-     * Obtener propiedad por slug
-     */
-    public function get_property_by_slug($slug) {
-        // Buscar en caché por slug
-        $cache_key = 'property_slug_' . $slug;
-        $cached = $this->cache->get($cache_key);
-
-        if ($cached !== false) {
-            return $cached;
-        }
-
-        // Buscar en todas las propiedades (esto podría optimizarse)
-        $properties = $this->get_properties(array('per_page' => 100));
-
-        if (is_wp_error($properties) || empty($properties['data'])) {
-            return false;
-        }
-
-        foreach ($properties['data'] as $property) {
-            $property_slug = $this->generate_property_slug($property);
-            if ($property_slug === $slug) {
-                $this->cache->set($cache_key, $property);
-                return $property;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Buscar propiedades
-     */
-    public function search_properties($search_params) {
-        $cache_key = 'search_' . md5(serialize($search_params));
-
-        // Intentar obtener del caché
-        $cached = $this->cache->get($cache_key);
-        if ($cached !== false) {
-            return $cached;
-        }
-
-        // Buscar en la API
-        $response = $this->api->search_properties($search_params);
-
-        if (is_wp_error($response)) {
-            return $response;
-        }
-
-        // Guardar en caché (tiempo más corto para búsquedas)
-        $this->cache->set($cache_key, $response, 1800); // 30 minutos
-
-        return $response;
-    }
-
-    /**
-     * Generar slug SEO-friendly para propiedad
-     */
-    public function generate_property_slug($property) {
-        $title = !empty($property['title']) ? $property['title'] : '';
-        $location = !empty($property['location']['city']) ? $property['location']['city'] : '';
-        $reference = !empty($property['reference']) ? $property['reference'] : $property['id'];
-
-        $slug_parts = array();
-
-        if ($title) {
-            $slug_parts[] = sanitize_title($title);
-        }
-
-        if ($location) {
-            $slug_parts[] = sanitize_title($location);
-        }
-
-        if ($reference) {
-            $slug_parts[] = sanitize_title($reference);
-        }
-
-        return implode('-', array_filter($slug_parts));
-    }
-
-    /**
-     * Generar URL SEO-friendly para propiedad
-     */
-    public function get_property_url($property) {
-        $slug = $this->generate_property_slug($property);
-        return home_url('/propiedad/' . $slug . '/');
-    }
-
-    /**
-     * Sincronizar propiedades (para cron)
+     * Sincroniza las propiedades de la API con los posts de WordPress.
      */
     public function sync_properties() {
-        $properties = $this->api->get_properties(array('per_page' => 100));
+        $page = 1;
+        $properties_per_page = 20; // Procesamos en lotes de 20 para no agotar la memoria
+        $has_more_pages = true;
+        $synced_ids = []; // Guardaremos los IDs de las propiedades sincronizadas
 
-        if (is_wp_error($properties)) {
-            error_log('Inmovilla Plugin: Error sincronizando propiedades - ' . $properties->get_error_message());
-            return;
-        }
+        while ($has_more_pages) {
+            $response = $this->api->get_properties(array(
+                'per_page' => $properties_per_page,
+                'page' => $page
+            ));
 
-        // Limpiar caché antiguo
-        $this->cache->flush_expired();
+            if (is_wp_error($response) || empty($response['data'])) {
+                $has_more_pages = false;
+                break;
+            }
 
-        // Pre-cargar propiedades en caché
-        if (!empty($properties['data'])) {
-            foreach ($properties['data'] as $property) {
-                $cache_key = 'property_' . $property['id'];
-                $this->cache->set($cache_key, $property);
-
-                // También guardar por slug
-                $slug = $this->generate_property_slug($property);
-                $slug_cache_key = 'property_slug_' . $slug;
-                $this->cache->set($slug_cache_key, $property);
+            foreach ($response['data'] as $property_data) {
+                $this->create_or_update_property($property_data);
+                $synced_ids[] = $property_data['id']; // Guardamos el ID de Inmovilla
+            }
+            
+            if (count($response['data']) < $properties_per_page) {
+                $has_more_pages = false;
+            } else {
+                $page++;
             }
         }
+        
+        // Opcional: Ocultar propiedades que ya no están en la API
+        $this->hide_old_properties($synced_ids);
 
         update_option('inmovilla_last_sync', current_time('mysql'));
     }
 
     /**
-     * Obtener tipos de propiedades
+     * Crea o actualiza un post de tipo 'inmovilla_property'
      */
-    public function get_property_types() {
-        $cache_key = 'property_types';
+    private function create_or_update_property($data) {
+        $inmovilla_id = $data['id'];
 
-        $cached = $this->cache->get($cache_key);
-        if ($cached !== false) {
-            return $cached;
+        // Buscamos si ya existe un post con este ID de Inmovilla
+        $existing_post = get_posts(array(
+            'post_type' => 'inmovilla_property',
+            'meta_key' => '_inmovilla_id',
+            'meta_value' => $inmovilla_id,
+            'posts_per_page' => 1
+        ));
+
+        $post_data = array(
+            'post_title' => wp_strip_all_tags($data['title'] ?? 'Propiedad sin título'),
+            'post_content' => $data['description'] ?? '',
+            'post_status' => 'publish',
+            'post_type' => 'inmovilla_property',
+        );
+
+        if ($existing_post) {
+            // Si existe, lo actualizamos
+            $post_data['ID'] = $existing_post[0]->ID;
+            wp_update_post($post_data);
+            $post_id = $existing_post[0]->ID;
+        } else {
+            // Si no existe, lo creamos
+            $post_id = wp_insert_post($post_data);
         }
 
-        $response = $this->api->get_property_types();
+        // Guardamos todos los datos de la propiedad como campos personalizados
+        if ($post_id && !is_wp_error($post_id)) {
+            update_post_meta($post_id, '_inmovilla_id', $inmovilla_id); // ID único de Inmovilla
+            update_post_meta($post_id, 'price', $data['price'] ?? '');
+            update_post_meta($post_id, 'reference', $data['reference'] ?? '');
+            update_post_meta($post_id, 'bedrooms', $data['bedrooms'] ?? '');
+            update_post_meta($post_id, 'bathrooms', $data['bathrooms'] ?? '');
+            update_post_meta($post_id, 'size', $data['size'] ?? '');
+            update_post_meta($post_id, 'featured', $data['featured'] ?? false);
+            update_post_meta($post_id, 'property_type', $data['type'] ?? '');
 
-        if (!is_wp_error($response)) {
-            $this->cache->set($cache_key, $response, 86400); // 24 horas
+            // Guardamos datos de ubicación
+            if (!empty($data['location'])) {
+                update_post_meta($post_id, 'location_city', $data['location']['city'] ?? '');
+                update_post_meta($post_id, 'location_district', $data['location']['district'] ?? '');
+            }
+            
+            // Guardamos la galería de imágenes (como un array)
+            if (!empty($data['images'])) {
+                update_post_meta($post_id, 'gallery_images', $data['images']);
+                // Establecemos la primera imagen como imagen destacada del post
+                set_post_thumbnail_from_url($post_id, $data['images'][0]['url']);
+            }
         }
-
-        return $response;
     }
-
+    
     /**
-     * Obtener ubicaciones
+     * Oculta (pone en borrador) las propiedades que ya no existen en la API de Inmovilla.
      */
-    public function get_locations() {
-        $cache_key = 'locations';
+    private function hide_old_properties($synced_ids) {
+        $args = array(
+            'post_type' => 'inmovilla_property',
+            'posts_per_page' => -1,
+            'meta_query' => array(
+                array(
+                    'key' => '_inmovilla_id',
+                    'value' => $synced_ids,
+                    'compare' => 'NOT IN'
+                )
+            )
+        );
+        $old_properties = get_posts($args);
 
-        $cached = $this->cache->get($cache_key);
-        if ($cached !== false) {
-            return $cached;
+        foreach($old_properties as $old_property) {
+            $old_property->post_status = 'draft';
+            wp_update_post($old_property);
         }
-
-        $response = $this->api->get_locations();
-
-        if (!is_wp_error($response)) {
-            $this->cache->set($cache_key, $response, 86400); // 24 horas
-        }
-
-        return $response;
-    }
-
-    /**
-     * Formatear precio
-     */
-    public function format_price($price, $currency = '€') {
-        if (!is_numeric($price)) {
-            return $price;
-        }
-
-        return number_format($price, 0, ',', '.') . ' ' . $currency;
-    }
-
-    /**
-     * Obtener imagen principal de propiedad
-     */
-    public function get_property_featured_image($property) {
-        if (!empty($property['images']) && is_array($property['images'])) {
-            return $property['images'][0]['url'] ?? '';
-        }
-
-        return '';
-    }
-
-    /**
-     * Obtener galería de imágenes
-     */
-    public function get_property_gallery($property) {
-        return !empty($property['images']) ? $property['images'] : array();
     }
 }
-?>
+
+/**
+ * Función auxiliar para establecer la imagen destacada desde una URL.
+ */
+if (!function_exists('set_post_thumbnail_from_url')) {
+    function set_post_thumbnail_from_url($post_id, $url) {
+        require_once(ABSPATH . 'wp-admin/includes/media.php');
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+        require_once(ABSPATH . 'wp-admin/includes/image.php');
+
+        // Evitar duplicados
+        if (get_page_by_title(basename($url), 'OBJECT', 'attachment')) {
+            return;
+        }
+
+        $tmp = download_url($url);
+        if (is_wp_error($tmp)) {
+            return;
+        }
+
+        $file_array = array(
+            'name' => basename($url),
+            'tmp_name' => $tmp
+        );
+
+        $id = media_handle_sideload($file_array, $post_id);
+
+        if (is_wp_error($id)) {
+            @unlink($file_array['tmp_name']);
+            return;
+        }
+
+        set_post_thumbnail($post_id, $id);
+    }
+}

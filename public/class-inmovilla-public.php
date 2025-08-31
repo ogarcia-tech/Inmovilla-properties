@@ -22,31 +22,31 @@ class Inmovilla_Public {
     public function enqueue_scripts() {
         // CSS Principal
         wp_enqueue_style('inmovilla-public', 
-            INMOVILLA_PLUGIN_URL . 'assets/css/inmovilla-public.css', 
+            INMOVILLA_PROPERTIES_PLUGIN_URL . 'assets/css/inmovilla-public.css', 
             array(), 
-            INMOVILLA_VERSION
+            INMOVILLA_PROPERTIES_VERSION
         );
         
         // CSS Responsive
         wp_enqueue_style('inmovilla-responsive', 
-            INMOVILLA_PLUGIN_URL . 'assets/css/inmovilla-responsive.css', 
+            INMOVILLA_PROPERTIES_PLUGIN_URL . 'assets/css/inmovilla-responsive.css', 
             array('inmovilla-public'), 
-            INMOVILLA_VERSION
+            INMOVILLA_PROPERTIES_VERSION
         );
         
         // JavaScript principal
         wp_enqueue_script('inmovilla-public', 
-            INMOVILLA_PLUGIN_URL . 'assets/js/inmovilla-public.js', 
+            INMOVILLA_PROPERTIES_PLUGIN_URL . 'assets/js/inmovilla-public.js', 
             array('jquery'), 
-            INMOVILLA_VERSION, 
+            INMOVILLA_PROPERTIES_VERSION, 
             true
         );
         
         // JavaScript para búsquedas
         wp_enqueue_script('inmovilla-search', 
-            INMOVILLA_PLUGIN_URL . 'assets/js/inmovilla-search.js', 
+            INMOVILLA_PROPERTIES_PLUGIN_URL . 'assets/js/inmovilla-search.js', 
             array('jquery', 'inmovilla-public'), 
-            INMOVILLA_VERSION, 
+            INMOVILLA_PROPERTIES_VERSION, 
             true
         );
         
@@ -119,12 +119,10 @@ class Inmovilla_Public {
     private function is_inmovilla_page() {
         global $wp_query;
         
-        // Verificar si es una página de propiedades
         if (isset($wp_query->query_vars['inmovilla_properties'])) {
             return true;
         }
         
-        // Verificar si es una propiedad individual
         if (isset($wp_query->query_vars['inmovilla_property'])) {
             return true;
         }
@@ -142,12 +140,10 @@ class Inmovilla_Public {
         
         global $wp_query;
         
-        // Schema para propiedad individual
         if (isset($wp_query->query_vars['inmovilla_property'])) {
             $this->add_property_schema();
         }
         
-        // Schema para listado de propiedades
         if (isset($wp_query->query_vars['inmovilla_properties'])) {
             $this->add_properties_list_schema();
         }
@@ -178,7 +174,6 @@ class Inmovilla_Public {
             )
         );
         
-        // Añadir dirección si existe
         if (!empty($property['address'])) {
             $schema['address'] = array(
                 '@type' => 'PostalAddress',
@@ -188,7 +183,6 @@ class Inmovilla_Public {
             );
         }
         
-        // Añadir características
         if (!empty($property['bedrooms'])) {
             $schema['numberOfRooms'] = intval($property['bedrooms']);
         }
@@ -205,7 +199,6 @@ class Inmovilla_Public {
             );
         }
         
-        // Añadir imágenes
         if (!empty($property['images'])) {
             $schema['image'] = array_map(function($img) {
                 return $img['url'] ?? $img;

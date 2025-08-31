@@ -26,42 +26,39 @@ $cities = $api->get_cities();
             <div class="search-fields-row">
         <?php endif; ?>
         
-        <!-- Campo Tipo de Propiedad -->
         <?php if (in_array('type', $fields)): ?>
             <div class="search-field">
                 <label for="property-type"><?php _e('Tipo', 'inmovilla-properties'); ?></label>
                 <select name="type" id="property-type" class="form-control">
                     <option value=""><?php _e('Cualquier tipo', 'inmovilla-properties'); ?></option>
-                    <?php foreach ($property_types as $type): ?>
+                    <?php if (!empty($property_types['data'])): foreach ($property_types['data'] as $type): ?>
                         <option value="<?php echo esc_attr($type['value']); ?>" 
                                 <?php selected($_GET['type'] ?? '', $type['value']); ?>>
                             <?php echo esc_html($type['label']); ?>
                         </option>
-                    <?php endforeach; ?>
+                    <?php endforeach; endif; ?>
                 </select>
             </div>
         <?php endif; ?>
         
-        <!-- Campo Ciudad -->
         <?php if (in_array('city', $fields)): ?>
             <div class="search-field">
                 <label for="property-city"><?php _e('Ciudad', 'inmovilla-properties'); ?></label>
                 <select name="city" id="property-city" class="form-control">
                     <option value=""><?php _e('Cualquier ciudad', 'inmovilla-properties'); ?></option>
-                    <?php foreach ($cities as $city): ?>
+                    <?php if (!empty($cities['data'])): foreach ($cities['data'] as $city): ?>
                         <option value="<?php echo esc_attr($city); ?>" 
                                 <?php selected($_GET['city'] ?? '', $city); ?>>
                             <?php echo esc_html($city); ?>
                         </option>
-                    <?php endforeach; ?>
+                    <?php endforeach; endif; ?>
                 </select>
             </div>
         <?php endif; ?>
         
-        <!-- Campo Precio -->
         <?php if (in_array('price', $fields)): ?>
             <div class="search-field search-field-price">
-                <label><?php _e('Precio', 'inmovilla-properties'); ?></label>
+                <label for="min-price"><?php _e('Precio', 'inmovilla-properties'); ?></label>
                 <div class="price-range">
                     <div class="price-min">
                         <input type="number" 
@@ -84,7 +81,6 @@ $cities = $api->get_cities();
             </div>
         <?php endif; ?>
         
-        <!-- Campo Habitaciones -->
         <?php if (in_array('bedrooms', $fields)): ?>
             <div class="search-field">
                 <label for="property-bedrooms"><?php _e('Habitaciones', 'inmovilla-properties'); ?></label>
@@ -104,7 +100,6 @@ $cities = $api->get_cities();
             </div>
         <?php endif; ?>
         
-        <!-- Campo Baños -->
         <?php if (in_array('bathrooms', $fields)): ?>
             <div class="search-field">
                 <label for="property-bathrooms"><?php _e('Baños', 'inmovilla-properties'); ?></label>
@@ -124,7 +119,6 @@ $cities = $api->get_cities();
             </div>
         <?php endif; ?>
         
-        <!-- Botón de búsqueda -->
         <div class="search-field search-field-button">
             <button type="submit" class="btn btn-primary search-button">
                 <i class="fas fa-search"></i>
@@ -136,7 +130,6 @@ $cities = $api->get_cities();
             </div>
         <?php endif; ?>
         
-        <!-- Búsqueda avanzada (colapsar/expandir) -->
         <div class="advanced-search-toggle">
             <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#advanced-search">
                 <i class="fas fa-sliders-h"></i>
@@ -147,25 +140,25 @@ $cities = $api->get_cities();
         
         <div class="collapse advanced-search" id="advanced-search">
             <div class="advanced-fields">
-                <!-- Superficie -->
                 <div class="search-field">
-                    <label><?php _e('Superficie (m²)', 'inmovilla-properties'); ?></label>
+                    <label for="min_size"><?php _e('Superficie (m²)', 'inmovilla-properties'); ?></label>
                     <div class="size-range">
                         <input type="number" 
-                               name="min_size" 
+                               name="min_size"
+                               id="min_size" 
                                class="form-control" 
                                placeholder="<?php _e('Mín.', 'inmovilla-properties'); ?>"
                                value="<?php echo esc_attr($_GET['min_size'] ?? ''); ?>" />
                         <span>-</span>
                         <input type="number" 
                                name="max_size" 
+                               id="max_size"
                                class="form-control" 
                                placeholder="<?php _e('Máx.', 'inmovilla-properties'); ?>"
                                value="<?php echo esc_attr($_GET['max_size'] ?? ''); ?>" />
                     </div>
                 </div>
                 
-                <!-- Zona -->
                 <div class="search-field">
                     <label for="property-zone"><?php _e('Zona', 'inmovilla-properties'); ?></label>
                     <input type="text" 
@@ -176,7 +169,6 @@ $cities = $api->get_cities();
                            value="<?php echo esc_attr($_GET['zone'] ?? ''); ?>" />
                 </div>
                 
-                <!-- Características especiales -->
                 <div class="search-field search-field-features">
                     <label><?php _e('Características', 'inmovilla-properties'); ?></label>
                     <div class="features-checkboxes">
@@ -206,11 +198,9 @@ $cities = $api->get_cities();
         </div>
     </div>
     
-    <!-- Resultados de búsqueda -->
     <div class="search-results-summary" id="search-results-summary" style="display: none;"></div>
 </form>
 
-<!-- Loading overlay -->
 <div class="search-loading" id="search-loading" style="display: none;">
     <div class="loading-spinner">
         <i class="fas fa-spinner fa-spin"></i>
