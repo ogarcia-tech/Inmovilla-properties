@@ -481,3 +481,58 @@
 .feature-size .inmovilla-icon-size::before {
     content: '\f546'; /* Icono de regla */
 }
+
+/* Modal de contacto */
+.inmovilla-contact-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.inmovilla-contact-modal .inmovilla-modal-content {
+    background: #fff;
+    padding: 20px;
+    max-width: 500px;
+    width: 90%;
+    border-radius: var(--inmovilla-radius);
+    position: relative;
+    box-shadow: var(--inmovilla-shadow);
+}
+
+.inmovilla-contact-modal .inmovilla-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.inmovilla-contact-modal .form-group {
+    margin-bottom: 15px;
+}
+
+.inmovilla-contact-modal label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.inmovilla-contact-modal input[type="text"],
+.inmovilla-contact-modal input[type="email"],
+.inmovilla-contact-modal textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--inmovilla-border);
+    border-radius: var(--inmovilla-radius);
+}
+
+.inmovilla-contact-modal textarea {
+    min-height: 100px;
+    resize: vertical;
+}

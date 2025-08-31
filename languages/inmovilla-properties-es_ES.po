@@ -59,3 +59,63 @@ msgstr "Ver detalles"
 #: templates/property-card.php:127
 msgid "Contactar"
 msgstr "Contactar"
+
+#: templates/property-single.php:97
+msgid "Hacer una oferta"
+msgstr "Hacer una oferta"
+
+#: templates/property-single.php:102
+msgid "Solicitar cita"
+msgstr "Solicitar cita"
+
+#: templates/property-single.php:107
+msgid "Solicitar llamada"
+msgstr "Solicitar llamada"
+
+#: templates/property-single.php:119
+msgid "Nombre"
+msgstr "Nombre"
+
+#: templates/property-single.php:124
+msgid "Email"
+msgstr "Email"
+
+#: templates/property-single.php:129
+msgid "Teléfono"
+msgstr "Teléfono"
+
+#: templates/property-single.php:134
+msgid "Mensaje"
+msgstr "Mensaje"
+
+#: templates/property-single.php:139
+msgid "¿Cómo nos has conocido?"
+msgstr "¿Cómo nos has conocido?"
+
+#: templates/property-single.php:144
+msgid "Acepto la política de privacidad"
+msgstr "Acepto la política de privacidad"
+
+#: templates/property-single.php:148
+msgid "Enviar"
+msgstr "Enviar"
+
+#: public/class-inmovilla-ajax.php:176
+msgid "Por favor completa todos los campos obligatorios."
+msgstr "Por favor completa todos los campos obligatorios."
+
+#: public/class-inmovilla-ajax.php:182
+msgid "Solicitud: %s"
+msgstr "Solicitud: %s"
+
+#: public/class-inmovilla-ajax.php:183
+msgid "Nombre: %1$s\nEmail: %2$s\nTeléfono: %3$s\nOrigen: %4$s\nID Propiedad: %5$d\nMensaje:\n%6$s"
+msgstr "Nombre: %1$s\nEmail: %2$s\nTeléfono: %3$s\nOrigen: %4$s\nID Propiedad: %5$d\nMensaje:\n%6$s"
+
+#: public/class-inmovilla-ajax.php:192
+msgid "Solicitud enviada correctamente."
+msgstr "Solicitud enviada correctamente."
+
+#: public/class-inmovilla-ajax.php:195
+msgid "Error al enviar la solicitud."
+msgstr "Error al enviar la solicitud."

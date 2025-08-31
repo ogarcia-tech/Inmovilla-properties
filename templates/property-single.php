@@ -86,12 +86,25 @@ get_header(); ?>
                         <?php endif; ?>
 
                         <div class="property-actions">
-                            <button class="inmovilla-btn inmovilla-btn-primary inmovilla-contact-btn" 
-                                    data-property-id="<?php echo esc_attr($property['id']); ?>">
-                                📞 <?php _e('Contactar', 'inmovilla-properties'); ?>
+                            <button class="inmovilla-btn inmovilla-btn-primary inmovilla-contact-btn"
+                                    data-property-id="<?php echo esc_attr($property['id']); ?>"
+                                    data-subject="<?php esc_attr_e('Hacer una oferta', 'inmovilla-properties'); ?>">
+                                💰 <?php _e('Hacer una oferta', 'inmovilla-properties'); ?>
                             </button>
 
-                            <button class="inmovilla-btn inmovilla-btn-secondary inmovilla-favorite-btn" 
+                            <button class="inmovilla-btn inmovilla-btn-primary inmovilla-contact-btn"
+                                    data-property-id="<?php echo esc_attr($property['id']); ?>"
+                                    data-subject="<?php esc_attr_e('Solicitar cita', 'inmovilla-properties'); ?>">
+                                📅 <?php _e('Solicitar cita', 'inmovilla-properties'); ?>
+                            </button>
+
+                            <button class="inmovilla-btn inmovilla-btn-primary inmovilla-contact-btn"
+                                    data-property-id="<?php echo esc_attr($property['id']); ?>"
+                                    data-subject="<?php esc_attr_e('Solicitar llamada', 'inmovilla-properties'); ?>">
+                                📞 <?php _e('Solicitar llamada', 'inmovilla-properties'); ?>
+                            </button>
+
+                            <button class="inmovilla-btn inmovilla-btn-secondary inmovilla-favorite-btn"
                                     data-property-id="<?php echo esc_attr($property['id']); ?>">
                                 ♡ <?php _e('Favorito', 'inmovilla-properties'); ?>
                             </button>
@@ -170,6 +183,48 @@ get_header(); ?>
                 <?php echo do_shortcode('[inmovilla_properties limit="4" type="' . ($property['type'] ?? '') . '" location="' . ($property['location']['city'] ?? '') . '"]'); ?>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Modal de contacto -->
+<div id="inmovilla-contact-modal" class="inmovilla-contact-modal" style="display:none;">
+    <div class="inmovilla-modal-content">
+        <span class="inmovilla-modal-close">&times;</span>
+        <form id="inmovilla-contact-form">
+            <input type="hidden" name="property_id" value="<?php echo esc_attr($property['id']); ?>">
+            <input type="hidden" name="subject" id="inmovilla-contact-subject" value="">
+
+            <div class="form-group">
+                <label for="inmovilla-name"><?php _e('Nombre', 'inmovilla-properties'); ?></label>
+                <input type="text" id="inmovilla-name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="inmovilla-email"><?php _e('Email', 'inmovilla-properties'); ?></label>
+                <input type="email" id="inmovilla-email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="inmovilla-phone"><?php _e('Teléfono', 'inmovilla-properties'); ?></label>
+                <input type="text" id="inmovilla-phone" name="phone">
+            </div>
+
+            <div class="form-group">
+                <label for="inmovilla-message"><?php _e('Mensaje', 'inmovilla-properties'); ?></label>
+                <textarea id="inmovilla-message" name="message" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="inmovilla-source"><?php _e('¿Cómo nos has conocido?', 'inmovilla-properties'); ?></label>
+                <input type="text" id="inmovilla-source" name="source">
+            </div>
+
+            <div class="form-group">
+                <label><input type="checkbox" name="privacy" required> <?php _e('Acepto la política de privacidad', 'inmovilla-properties'); ?></label>
+            </div>
+
+            <button type="submit" class="inmovilla-btn inmovilla-btn-primary"><?php _e('Enviar', 'inmovilla-properties'); ?></button>
+        </form>
     </div>
 </div>
 

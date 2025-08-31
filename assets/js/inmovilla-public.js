@@ -60,6 +60,36 @@
             $(document).on('click', '.inmovilla-mobile-menu-toggle', function() {
                 $('.inmovilla-mobile-menu').slideToggle();
             });
+
+            // Abrir formulario de contacto
+            $(document).on('click', '.inmovilla-contact-btn', function(e) {
+                e.preventDefault();
+                var subject = $(this).data('subject') || '';
+                $('#inmovilla-contact-subject').val(subject);
+                $('#inmovilla-contact-modal').fadeIn();
+            });
+
+            // Cerrar formulario de contacto
+            $(document).on('click', '.inmovilla-modal-close', function() {
+                $('#inmovilla-contact-modal').fadeOut();
+            });
+
+            // Enviar formulario de contacto
+            $(document).on('submit', '#inmovilla-contact-form', function(e) {
+                e.preventDefault();
+                var $form = $(this);
+                var data = $form.serialize();
+                data += '&action=inmovilla_send_contact&nonce=' + InmovillaPublic.config.nonce;
+                $.post(InmovillaPublic.config.ajaxUrl, data, function(response) {
+                    if (response.success) {
+                        $form[0].reset();
+                        $('#inmovilla-contact-modal').fadeOut();
+                        InmovillaPublic.showNotification(response.data.message, 'success');
+                    } else {
+                        InmovillaPublic.showNotification(response.data.message, 'error');
+                    }
+                });
+            });
         },
 
         // Inicializar galería de imágenes
