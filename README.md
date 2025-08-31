@@ -76,6 +76,22 @@ El plugin genera URLs amigables automáticamente:
 - Búsqueda: `/buscar-propiedades/`
 - Sitemap: `/sitemap-propiedades.xml`
 
+## Metakeys para Elementor
+
+Los siguientes metadatos están disponibles como *Dynamic Tags* en Elementor para mostrar información de las propiedades:
+
+- `price`
+- `reference`
+- `bedrooms`
+- `bathrooms`
+- `size`
+- `featured`
+- `property_type`
+- `location_city`
+- `location_district`
+- `gallery_images`
+- `_inmovilla_id`
+
 ## Soporte
 
 Para soporte técnico o consultas, contacta con el desarrollador del plugin.

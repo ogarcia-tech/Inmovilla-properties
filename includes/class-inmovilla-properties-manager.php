@@ -103,12 +103,6 @@ class Inmovilla_Properties_Manager {
             update_post_meta($post_id, 'size', $data['size'] ?? '');
             update_post_meta($post_id, 'featured', $data['featured'] ?? false);
             update_post_meta($post_id, 'property_type', $data['type'] ?? '');
-
-            // Guardamos datos de ubicación
-            if (!empty($data['location'])) {
-                update_post_meta($post_id, 'location_city', $data['location']['city'] ?? '');
-                update_post_meta($post_id, 'location_district', $data['location']['district'] ?? '');
-            }
             
             // Guardamos la galería de imágenes (como un array)
             if (!empty($data['images'])) {
@@ -116,9 +110,24 @@ class Inmovilla_Properties_Manager {
                 // Establecemos la primera imagen como imagen destacada del post
                 set_post_thumbnail_from_url($post_id, $data['images'][0]['url']);
             }
+
+            // Guardamos cualquier otro dato como metadato
+            foreach ($data as $key => $value) {
+                $this->save_meta_recursive($post_id, $key, $value);
+            }
         }
     }
-    
+
+    private function save_meta_recursive($post_id, $key, $value) {
+        if (is_array($value)) {
+            foreach ($value as $sub_key => $sub_value) {
+                $this->save_meta_recursive($post_id, "{$key}_{$sub_key}", $sub_value);
+            }
+        } else {
+            update_post_meta($post_id, sanitize_key($key), $value);
+        }
+    }
+
     /**
      * Oculta (pone en borrador) las propiedades que ya no existen en la API de Inmovilla.
      */
