@@ -58,7 +58,7 @@ class Inmovilla_Ajax {
             $html = '';
             foreach ($properties as $property) {
                 ob_start();
-                include INMOVILLA_PLUGIN_PATH . 'templates/property-card.php';
+                include INMOVILLA_PROPERTIES_PLUGIN_DIR . 'templates/property-card.php';
                 $html .= ob_get_clean();
             }
             
@@ -109,7 +109,7 @@ class Inmovilla_Ajax {
             $html = '';
             foreach ($properties as $property) {
                 ob_start();
-                include INMOVILLA_PLUGIN_PATH . 'templates/property-card.php';
+                include INMOVILLA_PROPERTIES_PLUGIN_DIR . 'templates/property-card.php';
                 $html .= ob_get_clean();
             }
             
