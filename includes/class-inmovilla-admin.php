@@ -123,14 +123,28 @@ class InmovillaAdmin {
             $('.color-picker').wpColorPicker();
 
             $('#test-connection').on('click', function() {
-                $(this).prop('disabled', true);
+                const $button = $(this);
+                const errorMsg = '<?php echo esc_js(__('Error de conexión', 'inmovilla-properties')); ?>';
+
+                $button.prop('disabled', true);
                 $('#connection-result').html('<?php _e('Probando...', 'inmovilla-properties'); ?>');
 
-                // Aquí iría la llamada AJAX para probar la conexión
-                setTimeout(function() {
-                    $('#test-connection').prop('disabled', false);
-                    $('#connection-result').html('<span style="color: green;"><?php _e('✓ Conexión exitosa', 'inmovilla-properties'); ?></span>');
-                }, 2000);
+                $.post(ajaxurl, {
+                    action: 'inmovilla_test_connection',
+                    nonce: '<?php echo wp_create_nonce('inmovilla_admin_nonce'); ?>'
+                }).done(function(response) {
+                    $button.prop('disabled', false);
+
+                    if (response.success) {
+                        $('#connection-result').html('<span style="color: green;">' + response.data.message + '</span>');
+                    } else {
+                        const message = response.data && response.data.message ? response.data.message : errorMsg;
+                        $('#connection-result').html('<span style="color: red;">' + message + '</span>');
+                    }
+                }).fail(function() {
+                    $button.prop('disabled', false);
+                    $('#connection-result').html('<span style="color: red;">' + errorMsg + '</span>');
+                });
             });
         });
         </script>

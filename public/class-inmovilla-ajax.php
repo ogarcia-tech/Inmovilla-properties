@@ -173,19 +173,19 @@ class Inmovilla_Ajax {
         
         try {
             $api = new Inmovilla_API();
-            $test = $api->test_connection();
-            
-            if ($test['success']) {
-                wp_send_json_success(array(
-                    'message' => __('Conexión exitosa con la API de Inmovilla', 'inmovilla-properties'),
-                    'data' => $test['data']
-                ));
-            } else {
+            $response = $api->test_connection();
+
+            if (is_wp_error($response)) {
                 wp_send_json_error(array(
-                    'message' => $test['message']
+                    'message' => $response->get_error_message()
                 ));
             }
-            
+
+            wp_send_json_success(array(
+                'message' => __('Conexión exitosa con la API de Inmovilla', 'inmovilla-properties'),
+                'data' => $response
+            ));
+
         } catch (Exception $e) {
             wp_send_json_error(array(
                 'message' => __('Error de conexión', 'inmovilla-properties'),
