@@ -131,8 +131,10 @@ class Inmovilla_Properties_Manager {
         } else {
             $sanitized_key = sanitize_key($key);
 
+
             $float_fields = array('price', 'size', 'latitude', 'longitude', 'energy_consumption', 'co2_emissions');
             $int_fields   = array('bedrooms', 'bathrooms');
+
 
             if (in_array($sanitized_key, $float_fields, true)) {
                 $sanitized_value = floatval($value);
