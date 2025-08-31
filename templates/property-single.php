@@ -86,18 +86,31 @@ get_header(); ?>
                         <?php endif; ?>
 
                         <div class="property-actions">
-                            <button class="inmovilla-btn inmovilla-btn-primary inmovilla-contact-btn" 
+                            <button class="inmovilla-btn inmovilla-btn-primary inmovilla-contact-btn"
                                     data-property-id="<?php echo esc_attr($property['id']); ?>">
                                 📞 <?php _e('Contactar', 'inmovilla-properties'); ?>
                             </button>
 
-                            <button class="inmovilla-btn inmovilla-btn-secondary inmovilla-favorite-btn" 
+                            <button class="inmovilla-btn inmovilla-btn-secondary inmovilla-favorite-btn"
                                     data-property-id="<?php echo esc_attr($property['id']); ?>">
                                 ♡ <?php _e('Favorito', 'inmovilla-properties'); ?>
                             </button>
 
                             <button class="inmovilla-btn inmovilla-btn-outline inmovilla-share-btn">
                                 🔗 <?php _e('Compartir', 'inmovilla-properties'); ?>
+                            </button>
+
+                            <?php if (!empty($property['property_pdf'])): ?>
+                                <button class="inmovilla-btn inmovilla-btn-outline inmovilla-print-btn"
+                                        data-pdf="<?php echo esc_url($property['property_pdf']); ?>">
+                                    🖨 <?php _e('Imprimir', 'inmovilla-properties'); ?>
+                                </button>
+                            <?php endif; ?>
+
+                            <button class="inmovilla-btn inmovilla-btn-outline inmovilla-send-btn"
+                                    data-subject="<?php echo esc_attr($property['title'] ?? __('Propiedad', 'inmovilla-properties')); ?>"
+                                    data-url="<?php echo esc_url($properties_manager->get_property_url($property)); ?>">
+                                ✉ <?php _e('Enviar', 'inmovilla-properties'); ?>
                             </button>
                         </div>
                     </div>
@@ -274,35 +287,22 @@ get_header(); ?>
                     <?php endif; ?>
 
                     <?php
-                    $extra_keys = [
-                        'balcony'          => __('Balcón', 'inmovilla-properties'),
-                        'patio'            => __('Patio', 'inmovilla-properties'),
-                        'terrace'          => __('Terraza', 'inmovilla-properties'),
-                        'built_in_closets' => __('Armarios empotrados', 'inmovilla-properties'),
-                        'electricity'      => __('Electricidad', 'inmovilla-properties'),
-                        'water'            => __('Agua', 'inmovilla-properties'),
-                        'garden'           => __('Jardín', 'inmovilla-properties'),
-                        'water_tank'       => __('Depósito de agua', 'inmovilla-properties'),
-                        'phone_line'       => __('Línea telefónica', 'inmovilla-properties'),
-                    ];
 
-                    $available_extras = [];
-                    foreach ($extra_keys as $meta_key => $label) {
-                        if (!empty($property[$meta_key])) {
-                            $available_extras[$meta_key] = $label;
-                        }
-                    }
-                    ?>
+                    $has_media = !empty($property['video_url']) || !empty($property['virtual_tour_url']) || !empty($property['property_pdf']);
+                    if ($has_media): ?>
+                        <div class="property-media">
+                            <h3><?php _e('Medios', 'inmovilla-properties'); ?></h3>
+                            <ul class="media-list">
+                                <?php if (!empty($property['video_url'])): ?>
+                                    <li><a href="<?php echo esc_url($property['video_url']); ?>" target="_blank" rel="noopener"><?php _e('Video', 'inmovilla-properties'); ?></a></li>
+                                <?php endif; ?>
+                                <?php if (!empty($property['virtual_tour_url'])): ?>
+                                    <li><a href="<?php echo esc_url($property['virtual_tour_url']); ?>" target="_blank" rel="noopener"><?php _e('Tour virtual', 'inmovilla-properties'); ?></a></li>
+                                <?php endif; ?>
+                                <?php if (!empty($property['property_pdf'])): ?>
+                                    <li><a href="<?php echo esc_url($property['property_pdf']); ?>" target="_blank" rel="noopener"><?php _e('PDF', 'inmovilla-properties'); ?></a></li>
+                                <?php endif; ?>
 
-                    <?php if (!empty($available_extras)): ?>
-                        <div class="property-extras">
-                            <h3><?php _e('Extras', 'inmovilla-properties'); ?></h3>
-                            <ul class="extras-list">
-                                <?php foreach ($available_extras as $key => $label): ?>
-                                    <li class="extra-item extra-<?php echo esc_attr($key); ?>">
-                                        <span class="extra-icon"></span><?php echo esc_html($label); ?>
-                                    </li>
-                                <?php endforeach; ?>
                             </ul>
                         </div>
                     <?php endif; ?>

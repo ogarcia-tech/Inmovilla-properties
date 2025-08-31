@@ -105,9 +105,13 @@ class Inmovilla_Properties_Manager {
             update_post_meta($post_id, 'size', isset($data['size']) ? floatval($data['size']) : '');
             update_post_meta($post_id, 'featured', !empty($data['featured']) ? 1 : 0);
             update_post_meta($post_id, 'property_type', isset($data['type']) ? sanitize_text_field($data['type']) : '');
-            update_post_meta($post_id, 'energy_rating', isset($data['energy_rating']) ? sanitize_text_field($data['energy_rating']) : '');
-            update_post_meta($post_id, 'energy_consumption', isset($data['energy_consumption']) ? floatval($data['energy_consumption']) : '');
-            update_post_meta($post_id, 'co2_emissions', isset($data['co2_emissions']) ? floatval($data['co2_emissions']) : '');
+
+
+            // Medios adicionales
+            update_post_meta($post_id, 'video_url', isset($data['video_url']) ? esc_url_raw($data['video_url']) : '');
+            update_post_meta($post_id, 'virtual_tour_url', isset($data['virtual_tour_url']) ? esc_url_raw($data['virtual_tour_url']) : '');
+            update_post_meta($post_id, 'property_pdf', isset($data['property_pdf']) ? esc_url_raw($data['property_pdf']) : '');
+
             
             // Guardamos la galería de imágenes (como un array)
             if (!empty($data['images'])) {

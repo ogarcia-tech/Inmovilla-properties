@@ -60,6 +60,24 @@
             $(document).on('click', '.inmovilla-mobile-menu-toggle', function() {
                 $('.inmovilla-mobile-menu').slideToggle();
             });
+
+            // Botón imprimir
+            $(document).on('click', '.inmovilla-print-btn', function() {
+                var pdfUrl = $(this).data('pdf');
+                if (pdfUrl) {
+                    window.open(pdfUrl, '_blank');
+                } else {
+                    window.print();
+                }
+            });
+
+            // Botón enviar por email
+            $(document).on('click', '.inmovilla-send-btn', function() {
+                var subject = $(this).data('subject') || '';
+                var url = $(this).data('url') || window.location.href;
+                var mailto = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(url);
+                window.location.href = mailto;
+            });
         },
 
         // Inicializar galería de imágenes
