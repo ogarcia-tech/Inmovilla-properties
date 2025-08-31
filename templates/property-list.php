@@ -28,7 +28,7 @@ $secondary_color = get_option('inmovilla_secondary_color', '#0073aa');
 
                     $template = locate_template('inmovilla/property-card.php');
                     if (!$template) {
-                        $template = INMOVILLA_PLUGIN_PATH . 'templates/property-card.php';
+                        $template = INMOVILLA_PROPERTIES_PLUGIN_DIR . 'templates/property-card.php';
                     }
                     include $template;
                     ?>
