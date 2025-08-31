@@ -22,7 +22,10 @@ class Inmovilla_Ajax {
         
         add_action('wp_ajax_inmovilla_get_cities', array($this, 'get_cities'));
         add_action('wp_ajax_nopriv_inmovilla_get_cities', array($this, 'get_cities'));
-        
+
+        add_action('wp_ajax_inmovilla_send_contact', array($this, 'send_contact'));
+        add_action('wp_ajax_nopriv_inmovilla_send_contact', array($this, 'send_contact'));
+
         // AJAX solo para administradores
         add_action('wp_ajax_inmovilla_test_connection', array($this, 'test_connection'));
         add_action('wp_ajax_inmovilla_sync_properties', array($this, 'sync_properties'));
@@ -168,7 +171,53 @@ class Inmovilla_Ajax {
             ));
         }
     }
-    
+
+    /**
+     * Enviar formulario de contacto
+     */
+    public function send_contact() {
+        check_ajax_referer('inmovilla_public_nonce', 'nonce');
+
+        $name    = sanitize_text_field($_POST['name'] ?? '');
+        $email   = sanitize_email($_POST['email'] ?? '');
+        $phone   = sanitize_text_field($_POST['phone'] ?? '');
+        $message = sanitize_textarea_field($_POST['message'] ?? '');
+        $subject = sanitize_text_field($_POST['subject'] ?? '');
+        $source  = sanitize_text_field($_POST['source'] ?? '');
+        $property_id = absint($_POST['property_id'] ?? 0);
+        $privacy = isset($_POST['privacy']);
+
+        if (empty($name) || empty($email) || empty($message) || !$privacy) {
+            wp_send_json_error(array(
+                'message' => __('Por favor completa todos los campos obligatorios.', 'inmovilla-properties'),
+            ));
+        }
+
+        $to = get_option('admin_email');
+        $email_subject = sprintf(__('Solicitud: %s', 'inmovilla-properties'), $subject);
+        $body = sprintf(
+            __('Nombre: %1$s\nEmail: %2$s\nTeléfono: %3$s\nOrigen: %4$s\nID Propiedad: %5$d\nMensaje:\n%6$s', 'inmovilla-properties'),
+            $name,
+            $email,
+            $phone,
+            $source,
+            $property_id,
+            $message
+        );
+
+        $headers = array('Reply-To: ' . $name . ' <' . $email . '>');
+
+        if (wp_mail($to, $email_subject, $body, $headers)) {
+            wp_send_json_success(array(
+                'message' => __('Solicitud enviada correctamente.', 'inmovilla-properties'),
+            ));
+        } else {
+            wp_send_json_error(array(
+                'message' => __('Error al enviar la solicitud.', 'inmovilla-properties'),
+            ));
+        }
+    }
+
     /**
      * Probar conexión con API (solo admin)
      */

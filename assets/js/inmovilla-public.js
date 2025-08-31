@@ -61,22 +61,36 @@
                 $('.inmovilla-mobile-menu').slideToggle();
             });
 
-            // Botón imprimir
-            $(document).on('click', '.inmovilla-print-btn', function() {
-                var pdfUrl = $(this).data('pdf');
-                if (pdfUrl) {
-                    window.open(pdfUrl, '_blank');
-                } else {
-                    window.print();
-                }
+
+            // Abrir formulario de contacto
+            $(document).on('click', '.inmovilla-contact-btn', function(e) {
+                e.preventDefault();
+                var subject = $(this).data('subject') || '';
+                $('#inmovilla-contact-subject').val(subject);
+                $('#inmovilla-contact-modal').fadeIn();
             });
 
-            // Botón enviar por email
-            $(document).on('click', '.inmovilla-send-btn', function() {
-                var subject = $(this).data('subject') || '';
-                var url = $(this).data('url') || window.location.href;
-                var mailto = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(url);
-                window.location.href = mailto;
+            // Cerrar formulario de contacto
+            $(document).on('click', '.inmovilla-modal-close', function() {
+                $('#inmovilla-contact-modal').fadeOut();
+            });
+
+            // Enviar formulario de contacto
+            $(document).on('submit', '#inmovilla-contact-form', function(e) {
+                e.preventDefault();
+                var $form = $(this);
+                var data = $form.serialize();
+                data += '&action=inmovilla_send_contact&nonce=' + InmovillaPublic.config.nonce;
+                $.post(InmovillaPublic.config.ajaxUrl, data, function(response) {
+                    if (response.success) {
+                        $form[0].reset();
+                        $('#inmovilla-contact-modal').fadeOut();
+                        InmovillaPublic.showNotification(response.data.message, 'success');
+                    } else {
+                        InmovillaPublic.showNotification(response.data.message, 'error');
+                    }
+                });
+
             });
         },
 
