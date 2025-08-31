@@ -105,6 +105,9 @@ class Inmovilla_Properties_Manager {
             update_post_meta($post_id, 'size', isset($data['size']) ? floatval($data['size']) : '');
             update_post_meta($post_id, 'featured', !empty($data['featured']) ? 1 : 0);
             update_post_meta($post_id, 'property_type', isset($data['type']) ? sanitize_text_field($data['type']) : '');
+            update_post_meta($post_id, 'energy_rating', isset($data['energy_rating']) ? sanitize_text_field($data['energy_rating']) : '');
+            update_post_meta($post_id, 'energy_consumption', isset($data['energy_consumption']) ? floatval($data['energy_consumption']) : '');
+            update_post_meta($post_id, 'co2_emissions', isset($data['co2_emissions']) ? floatval($data['co2_emissions']) : '');
             
             // Guardamos la galería de imágenes (como un array)
             if (!empty($data['images'])) {
@@ -128,7 +131,7 @@ class Inmovilla_Properties_Manager {
         } else {
             $sanitized_key = sanitize_key($key);
 
-            $float_fields = array('price', 'size', 'latitude', 'longitude');
+            $float_fields = array('price', 'size', 'latitude', 'longitude', 'energy_consumption', 'co2_emissions');
             $int_fields   = array('bedrooms', 'bathrooms');
 
             if (in_array($sanitized_key, $float_fields, true)) {
