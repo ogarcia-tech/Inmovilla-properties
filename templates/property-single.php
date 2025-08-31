@@ -140,6 +140,96 @@ get_header(); ?>
                                     <span class="feature-value"><?php echo esc_html($property['year_built']); ?></span>
                                 </div>
                             <?php endif; ?>
+
+                            <?php if (!empty($property['orientation'])): ?>
+                                <div class="feature-item">
+                                    <span class="feature-label"><?php _e('Orientación:', 'inmovilla-properties'); ?></span>
+                                    <span class="feature-value"><?php echo esc_html($property['orientation']); ?></span>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($property['surface_useful'])): ?>
+                                <div class="feature-item">
+                                    <span class="feature-label"><?php _e('Superficie útil:', 'inmovilla-properties'); ?></span>
+                                    <span class="feature-value"><?php echo esc_html($property['surface_useful']); ?> m²</span>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($property['plot'])): ?>
+                                <div class="feature-item">
+                                    <span class="feature-label"><?php _e('Parcela:', 'inmovilla-properties'); ?></span>
+                                    <span class="feature-value"><?php echo esc_html($property['plot']); ?> m²</span>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($property['views'])): ?>
+                                <div class="feature-item">
+                                    <span class="feature-label"><?php _e('Vistas:', 'inmovilla-properties'); ?></span>
+                                    <span class="feature-value"><?php echo esc_html($property['views']); ?></span>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($property['condition'])): ?>
+                                <div class="feature-item">
+                                    <span class="feature-label"><?php _e('Estado:', 'inmovilla-properties'); ?></span>
+                                    <span class="feature-value"><?php echo esc_html($property['condition']); ?></span>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($property['double_bedrooms'])): ?>
+                                <div class="feature-item">
+                                    <span class="feature-label"><?php _e('Dormitorios dobles:', 'inmovilla-properties'); ?></span>
+                                    <span class="feature-value"><?php echo esc_html($property['double_bedrooms']); ?></span>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($property['toilets'])): ?>
+                                <div class="feature-item">
+                                    <span class="feature-label"><?php _e('Aseos:', 'inmovilla-properties'); ?></span>
+                                    <span class="feature-value"><?php echo esc_html($property['toilets']); ?></span>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($property['floors'])): ?>
+                                <div class="feature-item">
+                                    <span class="feature-label"><?php _e('Plantas:', 'inmovilla-properties'); ?></span>
+                                    <span class="feature-value"><?php echo esc_html($property['floors']); ?></span>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($property['parking'])): ?>
+                                <div class="feature-item">
+                                    <span class="feature-label"><?php _e('Parking:', 'inmovilla-properties'); ?></span>
+                                    <span class="feature-value"><?php echo esc_html($property['parking']); ?></span>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (isset($property['air_conditioning']) && $property['air_conditioning'] !== ''): ?>
+                                <div class="feature-item">
+                                    <span class="feature-label"><?php _e('Aire acondicionado:', 'inmovilla-properties'); ?></span>
+                                    <span class="feature-value">
+                                        <?php
+                                        $ac = $property['air_conditioning'];
+                                        echo ($ac === '1' || $ac === 1 || $ac === true) ? __('Sí', 'inmovilla-properties') :
+                                            (($ac === '0' || $ac === 0 || $ac === false) ? __('No', 'inmovilla-properties') : esc_html($ac));
+                                        ?>
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($property['floor_type'])): ?>
+                                <div class="feature-item">
+                                    <span class="feature-label"><?php _e('Tipo de suelo:', 'inmovilla-properties'); ?></span>
+                                    <span class="feature-value"><?php echo esc_html($property['floor_type']); ?></span>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($property['exterior_type'])): ?>
+                                <div class="feature-item">
+                                    <span class="feature-label"><?php _e('Tipo exterior:', 'inmovilla-properties'); ?></span>
+                                    <span class="feature-value"><?php echo esc_html($property['exterior_type']); ?></span>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
 
