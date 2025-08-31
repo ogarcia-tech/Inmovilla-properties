@@ -151,14 +151,14 @@ class Inmovilla_Admin_Settings {
      */
     public function settings_page() {
         $this->options = get_option('inmovilla_properties_options');
-        include INMOVILLA_PLUGIN_PATH . 'admin/partials/settings-form.php';
+        include INMOVILLA_PROPERTIES_PLUGIN_DIR . 'admin/partials/settings-form.php';
     }
     
     /**
      * Página de dashboard
      */
     public function dashboard_page() {
-        include INMOVILLA_PLUGIN_PATH . 'admin/admin-dashboard.php';
+        include INMOVILLA_PROPERTIES_PLUGIN_DIR . 'admin/admin-dashboard.php';
     }
     
     /**
