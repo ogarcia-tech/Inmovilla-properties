@@ -152,10 +152,44 @@ get_header(); ?>
                         </div>
                     <?php endif; ?>
 
+                    <?php
+                    $extra_keys = [
+                        'balcony'          => __('Balcón', 'inmovilla-properties'),
+                        'patio'            => __('Patio', 'inmovilla-properties'),
+                        'terrace'          => __('Terraza', 'inmovilla-properties'),
+                        'built_in_closets' => __('Armarios empotrados', 'inmovilla-properties'),
+                        'electricity'      => __('Electricidad', 'inmovilla-properties'),
+                        'water'            => __('Agua', 'inmovilla-properties'),
+                        'garden'           => __('Jardín', 'inmovilla-properties'),
+                        'water_tank'       => __('Depósito de agua', 'inmovilla-properties'),
+                        'phone_line'       => __('Línea telefónica', 'inmovilla-properties'),
+                    ];
+
+                    $available_extras = [];
+                    foreach ($extra_keys as $meta_key => $label) {
+                        if (!empty($property[$meta_key])) {
+                            $available_extras[$meta_key] = $label;
+                        }
+                    }
+                    ?>
+
+                    <?php if (!empty($available_extras)): ?>
+                        <div class="property-extras">
+                            <h3><?php _e('Extras', 'inmovilla-properties'); ?></h3>
+                            <ul class="extras-list">
+                                <?php foreach ($available_extras as $key => $label): ?>
+                                    <li class="extra-item extra-<?php echo esc_attr($key); ?>">
+                                        <span class="extra-icon"></span><?php echo esc_html($label); ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+
                     <?php if (!empty($property['location']['lat']) && !empty($property['location']['lng'])): ?>
                         <div class="property-map">
                             <h3><?php _e('Ubicación', 'inmovilla-properties'); ?></h3>
-                            <div id="inmovilla-map" data-lat="<?php echo esc_attr($property['location']['lat']); ?>" 
+                            <div id="inmovilla-map" data-lat="<?php echo esc_attr($property['location']['lat']); ?>"
                                  data-lng="<?php echo esc_attr($property['location']['lng']); ?>">
                                 <!-- Mapa se cargará aquí -->
                             </div>

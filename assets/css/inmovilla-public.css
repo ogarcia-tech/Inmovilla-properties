@@ -481,3 +481,34 @@
 .feature-size .inmovilla-icon-size::before {
     content: '\f546'; /* Icono de regla */
 }
+/* ===================================
+   SECCIÓN DE EXTRAS
+=================================== */
+.property-extras {
+    margin-top: 30px;
+}
+
+.property-extras .extras-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+}
+
+.property-extras .extra-item {
+    display: flex;
+    align-items: center;
+    background: var(--inmovilla-light);
+    border-radius: var(--inmovilla-radius);
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.property-extras .extra-icon {
+    background: url('../images/icon-check.svg') no-repeat center;
+    background-size: contain;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+}
