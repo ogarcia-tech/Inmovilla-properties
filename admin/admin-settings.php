@@ -112,6 +112,14 @@ class Inmovilla_Admin_Settings {
             'inmovilla_properties_settings',
             'inmovilla_api_section'
         );
+
+        add_settings_field(
+            'xml_feed_url',
+            __('URL del Feed XML', 'inmovilla-properties'),
+            array($this, 'xml_feed_url_callback'),
+            'inmovilla_properties_settings',
+            'inmovilla_api_section'
+        );
         
         // Sección Diseño
         add_settings_section(
@@ -214,6 +222,16 @@ class Inmovilla_Admin_Settings {
             <p class="description">%s</p>',
             esc_attr($value),
             __('Endpoint clásico de Inmovilla (param + json=1)', 'inmovilla-properties')
+        );
+    }
+
+    public function xml_feed_url_callback() {
+        $value = isset($this->options['xml_feed_url']) ? $this->options['xml_feed_url'] : '';
+        printf(
+            '<input type="url" id="xml_feed_url" name="inmovilla_properties_options[xml_feed_url]" value="%s" class="regular-text" placeholder="https://procesos.inmovilla.com/xml/..." />
+            <p class="description">%s</p>',
+            esc_attr($value),
+            __('Introduce la URL completa del feed XML que Inmovilla genera para tu agencia.', 'inmovilla-properties')
         );
     }
     
