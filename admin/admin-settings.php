@@ -80,7 +80,7 @@ class Inmovilla_Admin_Settings {
      */
     public function settings_init() {
         register_setting('inmovilla_properties_settings', 'inmovilla_properties_options');
-        
+
         // Sección API
         add_settings_section(
             'inmovilla_api_section',
@@ -88,15 +88,23 @@ class Inmovilla_Admin_Settings {
             array($this, 'api_section_callback'),
             'inmovilla_properties_settings'
         );
-        
+
         add_settings_field(
-            'api_token',
-            __('Token API', 'inmovilla-properties'),
-            array($this, 'api_token_callback'),
+            'agency_id',
+            __('Número de Agencia', 'inmovilla-properties'),
+            array($this, 'agency_id_callback'),
             'inmovilla_properties_settings',
             'inmovilla_api_section'
         );
-        
+
+        add_settings_field(
+            'api_password',
+            __('Contraseña API', 'inmovilla-properties'),
+            array($this, 'api_password_callback'),
+            'inmovilla_properties_settings',
+            'inmovilla_api_section'
+        );
+
         add_settings_field(
             'api_base_url',
             __('URL Base API', 'inmovilla-properties'),
@@ -179,25 +187,33 @@ class Inmovilla_Admin_Settings {
     /**
      * Callbacks de campos
      */
-    public function api_token_callback() {
-        $value = isset($this->options['api_token']) ? $this->options['api_token'] : '';
+    public function agency_id_callback() {
+        $value = isset($this->options['agency_id']) ? intval($this->options['agency_id']) : '';
         printf(
-            '<input type="password" id="api_token" name="inmovilla_properties_options[api_token]" value="%s" class="regular-text" />
-            <button type="button" class="button" onclick="togglePasswordVisibility(\'api_token\')">%s</button>
+            '<input type="number" id="agency_id" name="inmovilla_properties_options[agency_id]" value="%s" class="regular-text" />
             <p class="description">%s</p>',
             esc_attr($value),
-            __('Mostrar', 'inmovilla-properties'),
-            __('Token obtenido desde Inmovilla → Ajustes → Opciones → Token para API Rest', 'inmovilla-properties')
+            __('Número de agencia facilitado por Inmovilla (ej: 2)', 'inmovilla-properties')
         );
     }
-    
+
+    public function api_password_callback() {
+        $value = isset($this->options['api_password']) ? $this->options['api_password'] : '';
+        printf(
+            '<input type="password" id="api_password" name="inmovilla_properties_options[api_password]" value="%s" class="regular-text" />
+            <p class="description">%s</p>',
+            esc_attr($value),
+            __('Contraseña asociada a tu número de agencia', 'inmovilla-properties')
+        );
+    }
+
     public function api_base_url_callback() {
-        $value = isset($this->options['api_base_url']) ? $this->options['api_base_url'] : 'https://crm.inmovilla.com/api/v1/';
+        $value = isset($this->options['api_base_url']) ? $this->options['api_base_url'] : 'https://apiweb.inmovilla.com/apiweb/apiweb.php';
         printf(
             '<input type="url" id="api_base_url" name="inmovilla_properties_options[api_base_url]" value="%s" class="regular-text" />
             <p class="description">%s</p>',
             esc_attr($value),
-            __('URL base de la API de Inmovilla', 'inmovilla-properties')
+            __('Endpoint clásico de Inmovilla (param + json=1)', 'inmovilla-properties')
         );
     }
     
