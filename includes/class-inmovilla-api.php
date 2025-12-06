@@ -18,11 +18,11 @@ class InmovillaAPI {
     private $cache;
 
     public function __construct() {
-        $this->agency_number = (int) inmovilla_get_setting('agency_number');
+        $this->agency_number = (int) inmovilla_get_setting('agency_id');
         $this->agency_suffix = sanitize_text_field((string) inmovilla_get_setting('agency_suffix', ''));
         $this->api_password  = inmovilla_get_setting('api_password');
         $this->language      = (int) inmovilla_get_setting('language', 1);
-        $this->api_url       = inmovilla_get_setting('api_url', 'https://apiweb.inmovilla.com/apiweb/apiweb.php');
+        $this->api_url       = inmovilla_get_setting('api_base_url', 'https://apiweb.inmovilla.com/apiweb/apiweb.php');
 
         $this->cache = inmovilla_get_setting('cache_enabled', true)
             ? new InmovillaCache()

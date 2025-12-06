@@ -5,6 +5,7 @@ Plugin profesional para conectar WordPress con Inmovilla CRM. Incluye URLs SEO-f
 ## Características
 
 ✅ **Conexión API** con Inmovilla CRM
+✅ **Importación diaria por XML** sin consumir la API en frontend
 ✅ **URLs SEO-friendly** completamente indexables
 ✅ **Sistema de caché** inteligente  
 ✅ **Panel de administración** completo
@@ -19,7 +20,7 @@ Plugin profesional para conectar WordPress con Inmovilla CRM. Incluye URLs SEO-f
 1. Subir el plugin a `/wp-content/plugins/inmovilla-properties/`
 2. Activar el plugin desde el panel de WordPress
 3. Ir a Ajustes → Inmovilla Properties
-4. Configurar el token API de Inmovilla
+4. Introducir número de agencia, contraseña y URL del XML proporcionado por Inmovilla
 5. ¡Listo para usar!
 
 ## Shortcodes Disponibles
@@ -61,19 +62,19 @@ Propiedades destacadas.
 [inmovilla_featured limit="4"]
 ```
 
-## Configuración API
+## Configuración API y XML
 
-La API usada por este plugin es la clásica de Inmovilla basada en **Número de agencia + Contraseña** (no usa token REST).
+La API usada por este plugin es la clásica de Inmovilla basada en **Número de agencia + Contraseña** (no usa token REST) y, para la sincronización masiva, un **feed XML diario**.
 
-1. En la documentación del proveedor localiza tu **numagencia** y **contraseña** de la API (ej. numagencia `2`, contraseña `82ku9xz2aw3`).
-2. En WordPress ve a **Ajustes → Inmovilla Properties**.
-3. Introduce el número de agencia, un sufijo si tu cuenta lo requiere (ej. `_84`) y la contraseña API.
-4. Define el idioma (ID numérico de la tabla de idiomas de Inmovilla, por defecto `1` Español).
-5. Guarda los cambios y pulsa **Probar conexión API** para verificar.
+1. Localiza tu **numagencia** y **contraseña** (ej. `2` / `82ku9xz2aw3`).
+2. Obtén la URL del XML que expone toda tu cartera (ej. `https://procesos.inmovilla.com/xml/xml2demo/2-web.xml`).
+3. En WordPress ve a **Ajustes → Inmovilla Properties**.
+4. Introduce número de agencia, contraseña y pega la **URL del feed XML**.
+5. Guarda los cambios y pulsa **Probar conexión API** si necesitas validar credenciales puntuales.
 
 ## Sincronización
 
-El proceso de sincronización se ejecuta de forma periódica mediante WP-Cron. Cada ejecución procesa 20 propiedades; por ejemplo, seis ejecuciones consecutivas importarán unas 120 propiedades.
+El proceso de sincronización diaria lee el **XML completo** y crea/actualiza los posts `inmovilla_property` en WordPress (incluyendo imagen destacada y meta datos). Se ejecuta mediante WP-Cron (intervalo diario por defecto) y elimina las propiedades que ya no aparecen en el feed.
 
 ## URLs SEO
 

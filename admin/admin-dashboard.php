@@ -80,14 +80,18 @@ $sitemap_stats = $sitemap->get_sitemap_stats();
                         
                         <div class="api-info">
                             <h4><?php _e('Información de Configuración', 'inmovilla-properties'); ?></h4>
+                            <?php $options = get_option('inmovilla_properties_options', array()); ?>
                             <ul>
-                                <li><strong><?php _e('Token configurado:', 'inmovilla-properties'); ?></strong> 
-                                    <?php echo !empty(get_option('inmovilla_properties_options')['api_token']) ? '✅ Sí' : '❌ No'; ?>
+                                <li><strong><?php _e('Número de agencia:', 'inmovilla-properties'); ?></strong>
+                                    <?php echo !empty($options['agency_id']) ? '✅ ' . esc_html($options['agency_id']) : '❌ ' . __('No configurado', 'inmovilla-properties'); ?>
                                 </li>
-                                <li><strong><?php _e('URL Base:', 'inmovilla-properties'); ?></strong> 
-                                    <?php echo esc_html(get_option('inmovilla_properties_options')['api_base_url'] ?? 'No configurada'); ?>
+                                <li><strong><?php _e('Contraseña API:', 'inmovilla-properties'); ?></strong>
+                                    <?php echo !empty($options['api_password']) ? '✅ ' . __('Definida', 'inmovilla-properties') : '❌ ' . __('No configurada', 'inmovilla-properties'); ?>
                                 </li>
-                                <li><strong><?php _e('Caché activo:', 'inmovilla-properties'); ?></strong> 
+                                <li><strong><?php _e('URL Base:', 'inmovilla-properties'); ?></strong>
+                                    <?php echo esc_html($options['api_base_url'] ?? 'No configurada'); ?>
+                                </li>
+                                <li><strong><?php _e('Caché activo:', 'inmovilla-properties'); ?></strong>
                                     <?php echo get_option('inmovilla_cache_enabled', true) ? '✅ Sí' : '❌ No'; ?>
                                 </li>
                             </ul>

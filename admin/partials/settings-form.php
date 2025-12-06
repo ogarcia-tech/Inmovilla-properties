@@ -83,6 +83,23 @@ if (!defined('ABSPATH')) {
                             </p>
                         </td>
                     </tr>
+
+                    <tr>
+                        <th scope="row">
+                            <label for="xml_feed_url"><?php _e('URL del Feed XML', 'inmovilla-properties'); ?></label>
+                        </th>
+                        <td>
+                            <input type="url"
+                                   id="xml_feed_url"
+                                   name="inmovilla_properties_options[xml_feed_url]"
+                                   value="<?php echo esc_attr($this->options['xml_feed_url'] ?? ''); ?>"
+                                   class="regular-text"
+                                   placeholder="https://procesos.inmovilla.com/xml/..." />
+                            <p class="description">
+                                <?php _e('Introduce la URL del archivo XML proporcionada por Inmovilla para la sincronización diaria.', 'inmovilla-properties'); ?>
+                            </p>
+                        </td>
+                    </tr>
                     
                     <tr>
                         <th scope="row">
