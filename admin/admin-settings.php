@@ -55,17 +55,17 @@ class Inmovilla_Admin_Settings {
      */
     public function enqueue_admin_scripts($hook) {
         if (strpos($hook, 'inmovilla-properties') !== false) {
-            wp_enqueue_script('inmovilla-admin-js', 
-                INMOVILLA_PLUGIN_URL . 'assets/js/inmovilla-admin.js', 
-                array('jquery'), 
-                INMOVILLA_VERSION, 
+            wp_enqueue_script('inmovilla-admin-js',
+                INMOVILLA_PROPERTIES_ASSETS_URL . 'js/inmovilla-admin.js',
+                array('jquery'),
+                INMOVILLA_PROPERTIES_VERSION,
                 true
             );
-            
-            wp_enqueue_style('inmovilla-admin-css', 
-                INMOVILLA_PLUGIN_URL . 'assets/css/inmovilla-admin.css', 
-                array(), 
-                INMOVILLA_VERSION
+
+            wp_enqueue_style('inmovilla-admin-css',
+                INMOVILLA_PROPERTIES_ASSETS_URL . 'css/inmovilla-admin.css',
+                array(),
+                INMOVILLA_PROPERTIES_VERSION
             );
             
             wp_localize_script('inmovilla-admin-js', 'inmovilla_admin_ajax', array(
