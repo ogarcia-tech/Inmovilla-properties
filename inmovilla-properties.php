@@ -78,7 +78,7 @@ final class InmovillaProperties {
         require_once INMOVILLA_PROPERTIES_PLUGIN_DIR . 'public/class-inmovilla-ajax.php';
         
         if (is_admin()) {
-            require_once INMOVILLA_PROPERTIES_INCLUDES_DIR . 'class-inmovilla-admin.php';
+            require_once INMOVILLA_PROPERTIES_PLUGIN_DIR . 'admin/admin-settings.php';
         }
     }
 
@@ -100,7 +100,7 @@ final class InmovillaProperties {
         new Inmovilla_Public();
         new Inmovilla_Ajax();
         if (is_admin()) {
-            new InmovillaAdmin();
+            new Inmovilla_Admin_Settings();
         }
     }
 

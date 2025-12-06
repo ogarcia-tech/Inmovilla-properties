@@ -55,17 +55,17 @@ class Inmovilla_Admin_Settings {
      */
     public function enqueue_admin_scripts($hook) {
         if (strpos($hook, 'inmovilla-properties') !== false) {
-            wp_enqueue_script('inmovilla-admin-js', 
-                INMOVILLA_PLUGIN_URL . 'assets/js/inmovilla-admin.js', 
-                array('jquery'), 
-                INMOVILLA_VERSION, 
+            wp_enqueue_script('inmovilla-admin-js',
+                INMOVILLA_PROPERTIES_ASSETS_URL . 'js/inmovilla-admin.js',
+                array('jquery'),
+                INMOVILLA_PROPERTIES_VERSION,
                 true
             );
-            
-            wp_enqueue_style('inmovilla-admin-css', 
-                INMOVILLA_PLUGIN_URL . 'assets/css/inmovilla-admin.css', 
-                array(), 
-                INMOVILLA_VERSION
+
+            wp_enqueue_style('inmovilla-admin-css',
+                INMOVILLA_PROPERTIES_ASSETS_URL . 'css/inmovilla-admin.css',
+                array(),
+                INMOVILLA_PROPERTIES_VERSION
             );
             
             wp_localize_script('inmovilla-admin-js', 'inmovilla_admin_ajax', array(
@@ -109,6 +109,14 @@ class Inmovilla_Admin_Settings {
             'api_base_url',
             __('URL Base API', 'inmovilla-properties'),
             array($this, 'api_base_url_callback'),
+            'inmovilla_properties_settings',
+            'inmovilla_api_section'
+        );
+
+        add_settings_field(
+            'xml_feed_url',
+            __('URL del Feed XML', 'inmovilla-properties'),
+            array($this, 'xml_feed_url_callback'),
             'inmovilla_properties_settings',
             'inmovilla_api_section'
         );
@@ -214,6 +222,16 @@ class Inmovilla_Admin_Settings {
             <p class="description">%s</p>',
             esc_attr($value),
             __('Endpoint clásico de Inmovilla (param + json=1)', 'inmovilla-properties')
+        );
+    }
+
+    public function xml_feed_url_callback() {
+        $value = isset($this->options['xml_feed_url']) ? $this->options['xml_feed_url'] : '';
+        printf(
+            '<input type="url" id="xml_feed_url" name="inmovilla_properties_options[xml_feed_url]" value="%s" class="regular-text" placeholder="https://procesos.inmovilla.com/xml/..." />
+            <p class="description">%s</p>',
+            esc_attr($value),
+            __('Introduce la URL completa del feed XML que Inmovilla genera para tu agencia.', 'inmovilla-properties')
         );
     }
     
