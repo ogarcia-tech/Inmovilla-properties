@@ -364,7 +364,7 @@ class InmovillaAPI {
      * Construir consulta paginada.
      */
     private function fetch_properties($params) {
-        $limit = isset($params['limit']) ? max(1, (int) $params['limit']) : 12;
+        $limit = isset($params['limit']) ? max(1, (int) $params['limit']) : (isset($params['per_page']) ? max(1, (int) $params['per_page']) : 12);
         $page  = isset($params['page']) ? max(1, (int) $params['page']) : 1;
 
         $start_position = (($page - 1) * $limit) + 1;
@@ -443,18 +443,20 @@ class InmovillaAPI {
     private function build_where_clause($params) {
         $conditions = array();
 
-        if (!empty($params['type'])) {
-            $type = $this->clean_text_filter($params['type']);
-            if ($type) {
-                $conditions[] = sprintf("nbtipo like '%%%s%%'", $type);
-            }
+        if (!empty($params['type_id'])) {
+            $conditions[] = sprintf('key_tipo=%d', (int) $params['type_id']);
         }
 
-        if (!empty($params['city'])) {
-            $city = $this->clean_text_filter($params['city']);
-            if ($city) {
-                $conditions[] = sprintf("ciudad like '%%%s%%'", $city);
-            }
+        if (!empty($params['city_id'])) {
+            $conditions[] = sprintf('key_loca=%d', (int) $params['city_id']);
+        }
+
+        if (!empty($params['zone_id'])) {
+            $conditions[] = sprintf('key_zona=%d', (int) $params['zone_id']);
+        }
+
+        if (!empty($params['operation'])) {
+            $conditions[] = sprintf('keyacci=%d', (int) $params['operation']);
         }
 
         if (isset($params['min_price'])) {
@@ -465,12 +467,23 @@ class InmovillaAPI {
             $conditions[] = sprintf('precioinmo <= %d', (int) $params['max_price']);
         }
 
+        if (!empty($params['reference'])) {
+            $reference = $this->sanitize_reference($params['reference']);
+            if ($reference !== '') {
+                $conditions[] = sprintf("ref='%s'", $reference);
+            }
+        }
+
         if (isset($params['bedrooms']) && (int) $params['bedrooms'] > 0) {
             $conditions[] = sprintf('total_hab >= %d', (int) $params['bedrooms']);
         }
 
         if (isset($params['bathrooms']) && (int) $params['bathrooms'] > 0) {
             $conditions[] = sprintf('banyos >= %d', (int) $params['bathrooms']);
+        }
+
+        if (!empty($params['has_elevator'])) {
+            $conditions[] = 'ascensor=1';
         }
 
         return implode(' and ', $conditions);
@@ -483,16 +496,28 @@ class InmovillaAPI {
         return trim($value);
     }
 
+    private function sanitize_reference($reference) {
+        $reference = sanitize_text_field($reference);
+        $reference = preg_replace('/[^A-Za-z0-9\-]/', '', $reference);
+
+        return substr($reference, 0, 50);
+    }
+
     /**
      * Mapear propiedad resumida para listados.
      */
     private function map_property_summary($item) {
         $property_id = isset($item['cod_ofer']) ? (int) $item['cod_ofer'] : 0;
 
+        $price = isset($item['precioinmo']) ? (float) $item['precioinmo'] : 0;
+        if ($price <= 0 && isset($item['precioalq'])) {
+            $price = (float) $item['precioalq'];
+        }
+
         return array(
             'id'         => $property_id,
             'title'      => trim(($item['nbtipo'] ?? '') . ' ' . ($item['ciudad'] ?? '')),
-            'price'      => isset($item['precioinmo']) ? (float) $item['precioinmo'] : 0,
+            'price'      => $price,
             'location'   => array(
                 'city'     => $item['ciudad'] ?? '',
                 'district' => $item['zona'] ?? '',
@@ -525,10 +550,15 @@ class InmovillaAPI {
             }
         }
 
+        $price = isset($item['precioinmo']) ? (float) $item['precioinmo'] : 0;
+        if ($price <= 0 && isset($item['precioalq'])) {
+            $price = (float) $item['precioalq'];
+        }
+
         return array(
             'id'          => $property_id,
             'title'       => $title,
-            'price'       => isset($item['precioinmo']) ? (float) $item['precioinmo'] : 0,
+            'price'       => $price,
             'location'    => array(
                 'city'     => $item['ciudad'] ?? '',
                 'district' => $item['zona'] ?? '',

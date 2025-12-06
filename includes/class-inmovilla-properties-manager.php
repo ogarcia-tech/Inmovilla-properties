@@ -37,7 +37,7 @@ class Inmovilla_Properties_Manager {
 
         while ($has_more_pages) {
             $response = $this->api->get_properties(array(
-                'per_page' => $properties_per_page,
+                'limit' => $properties_per_page,
                 'page' => $page
             ));
 
