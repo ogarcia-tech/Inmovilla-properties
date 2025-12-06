@@ -10,31 +10,31 @@ if (!defined('ABSPATH')) {
 
 <div class="wrap">
     <h1><?php _e('Configuración Inmovilla Properties', 'inmovilla-properties'); ?></h1>
-    
-    <form method="post" action="options.php">
+
+    <form id="inmovilla-settings-form" method="post" action="options.php">
         <?php
         settings_fields('inmovilla_properties_settings');
         do_settings_sections('inmovilla_properties_settings');
         ?>
-        
+
         <div class="inmovilla-settings-tabs">
             <nav class="nav-tab-wrapper">
-                <a href="#api-settings" class="nav-tab nav-tab-active">
+                <a href="#api-settings" class="nav-tab nav-tab-active inmovilla-admin-nav-tab active" data-tab="api-settings">
                     <i class="fas fa-plug"></i> <?php _e('API', 'inmovilla-properties'); ?>
                 </a>
-                <a href="#design-settings" class="nav-tab">
+                <a href="#design-settings" class="nav-tab inmovilla-admin-nav-tab" data-tab="design-settings">
                     <i class="fas fa-paint-brush"></i> <?php _e('Diseño', 'inmovilla-properties'); ?>
                 </a>
-                <a href="#seo-settings" class="nav-tab">
+                <a href="#seo-settings" class="nav-tab inmovilla-admin-nav-tab" data-tab="seo-settings">
                     <i class="fas fa-search"></i> <?php _e('SEO', 'inmovilla-properties'); ?>
                 </a>
-                <a href="#advanced-settings" class="nav-tab">
+                <a href="#advanced-settings" class="nav-tab inmovilla-admin-nav-tab" data-tab="advanced-settings">
                     <i class="fas fa-cog"></i> <?php _e('Avanzado', 'inmovilla-properties'); ?>
                 </a>
             </nav>
-            
+
             <!-- API Settings Tab -->
-            <div id="api-settings" class="tab-content active">
+            <div id="api-settings" class="tab-content inmovilla-tab-content active">
                 <table class="form-table" role="presentation">
                     <tr>
                         <th scope="row">
@@ -129,7 +129,7 @@ if (!defined('ABSPATH')) {
             </div>
             
             <!-- Design Settings Tab -->
-            <div id="design-settings" class="tab-content">
+            <div id="design-settings" class="tab-content inmovilla-tab-content">
                 <table class="form-table" role="presentation">
                     <tr>
                         <th scope="row">
@@ -182,7 +182,7 @@ if (!defined('ABSPATH')) {
             </div>
             
             <!-- SEO Settings Tab -->
-            <div id="seo-settings" class="tab-content">
+            <div id="seo-settings" class="tab-content inmovilla-tab-content">
                 <table class="form-table" role="presentation">
                     <tr>
                         <th scope="row">
@@ -219,7 +219,7 @@ if (!defined('ABSPATH')) {
             </div>
             
             <!-- Advanced Settings Tab -->
-            <div id="advanced-settings" class="tab-content">
+            <div id="advanced-settings" class="tab-content inmovilla-tab-content">
                 <table class="form-table" role="presentation">
                     <tr>
                         <th scope="row">
