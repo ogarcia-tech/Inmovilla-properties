@@ -58,18 +58,55 @@ class InmovillaAdmin {
                 <table class="form-table">
                     <tr>
                         <th scope="row">
-                            <label for="api_token"><?php _e('Token API', 'inmovilla-properties'); ?></label>
+                            <label for="agency_number"><?php _e('Número de agencia', 'inmovilla-properties'); ?></label>
                         </th>
                         <td>
-                            <input 
-                                type="text" 
-                                id="api_token" 
-                                name="inmovilla_properties_settings[api_token]" 
-                                value="<?php echo esc_attr($settings['api_token'] ?? ''); ?>" 
+                            <input
+                                type="number"
+                                id="agency_number"
+                                name="inmovilla_properties_settings[agency_number]"
+                                value="<?php echo esc_attr($settings['agency_number'] ?? ''); ?>"
+                                class="small-text"
+                                min="1"
+                            />
+                            <p class="description">
+                                <?php _e('Clave numérica que proporciona Inmovilla (ej: 2)', 'inmovilla-properties'); ?>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">
+                            <label for="agency_suffix"><?php _e('Sufijo de agencia (opcional)', 'inmovilla-properties'); ?></label>
+                        </th>
+                        <td>
+                            <input
+                                type="text"
+                                id="agency_suffix"
+                                name="inmovilla_properties_settings[agency_suffix]"
+                                value="<?php echo esc_attr($settings['agency_suffix'] ?? ''); ?>"
                                 class="regular-text"
                             />
                             <p class="description">
-                                <?php _e('Introduce el token de API de tu cuenta Inmovilla', 'inmovilla-properties'); ?>
+                                <?php _e('Solo si tu número de agencia lleva sufijo, por ejemplo _84', 'inmovilla-properties'); ?>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">
+                            <label for="api_password"><?php _e('Contraseña API', 'inmovilla-properties'); ?></label>
+                        </th>
+                        <td>
+                            <input
+                                type="password"
+                                id="api_password"
+                                name="inmovilla_properties_settings[api_password]"
+                                value="<?php echo esc_attr($settings['api_password'] ?? ''); ?>"
+                                class="regular-text"
+                            />
+                            <p class="description">
+                                <?php _e('Contraseña proporcionada por Inmovilla para el servicio API (ej: 82ku9xz2aw3)', 'inmovilla-properties'); ?>
                             </p>
                         </td>
                     </tr>
@@ -87,6 +124,26 @@ class InmovillaAdmin {
                                 min="1"
                                 max="50"
                             />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">
+                            <label for="language"><?php _e('Idioma (ID)', 'inmovilla-properties'); ?></label>
+                        </th>
+                        <td>
+                            <input
+                                type="number"
+                                id="language"
+                                name="inmovilla_properties_settings[language]"
+                                value="<?php echo esc_attr($settings['language'] ?? 1); ?>"
+                                min="1"
+                                max="18"
+                                class="small-text"
+                            />
+                            <p class="description">
+                                <?php _e('ID de idioma según la tabla de la API (1=Español, 2=Inglés, etc.)', 'inmovilla-properties'); ?>
+                            </p>
                         </td>
                     </tr>
 
