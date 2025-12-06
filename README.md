@@ -104,6 +104,10 @@ Los siguientes metadatos están disponibles como *Dynamic Tags* en Elementor par
 
 Para soporte técnico o consultas, contacta con el desarrollador del plugin.
 
+## Información de desarrollo
+
+La versión **2.0** del plugin ha sido desarrollada por **Metricaweb**. Puedes obtener más información en [www.metricaweb.es](https://www.metricaweb.es).
+
 ## Changelog
 
 ### 1.0.0
