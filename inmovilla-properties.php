@@ -2,9 +2,9 @@
 /**
  * Plugin Name: Inmovilla Properties
  * Plugin URI: https://github.com/tuempresa/inmovilla-properties
- * Version: 2.0.3-final-fix
- * Author: Tu Empresa
- * Author URI: https://tuempresa.com
+ * Version: 2.0
+ * Author: Metricaweb
+ * Author URI: https://metricaweb.es
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: inmovilla-properties
@@ -78,7 +78,7 @@ final class InmovillaProperties {
         require_once INMOVILLA_PROPERTIES_PLUGIN_DIR . 'public/class-inmovilla-ajax.php';
         
         if (is_admin()) {
-            require_once INMOVILLA_PROPERTIES_INCLUDES_DIR . 'class-inmovilla-admin.php';
+            require_once INMOVILLA_PROPERTIES_PLUGIN_DIR . 'admin/admin-settings.php';
         }
     }
 
@@ -100,7 +100,7 @@ final class InmovillaProperties {
         new Inmovilla_Public();
         new Inmovilla_Ajax();
         if (is_admin()) {
-            new InmovillaAdmin();
+            new Inmovilla_Admin_Settings();
         }
     }
 
