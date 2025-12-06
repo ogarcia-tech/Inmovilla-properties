@@ -319,24 +319,44 @@ class Inmovilla_Ajax {
             $clean_filters['type'] = sanitize_text_field($filters['type']);
         }
         
-        if (isset($filters['city'])) {
-            $clean_filters['city'] = sanitize_text_field($filters['city']);
+        if (isset($filters['type_id'])) {
+            $clean_filters['type_id'] = absint($filters['type_id']);
         }
-        
+
+        if (isset($filters['city_id'])) {
+            $clean_filters['city_id'] = absint($filters['city_id']);
+        }
+
+        if (isset($filters['zone_id'])) {
+            $clean_filters['zone_id'] = absint($filters['zone_id']);
+        }
+
+        if (isset($filters['operation'])) {
+            $clean_filters['operation'] = absint($filters['operation']);
+        }
+
         if (isset($filters['min_price'])) {
             $clean_filters['min_price'] = intval($filters['min_price']);
         }
-        
+
         if (isset($filters['max_price'])) {
             $clean_filters['max_price'] = intval($filters['max_price']);
         }
-        
+
         if (isset($filters['bedrooms'])) {
             $clean_filters['bedrooms'] = intval($filters['bedrooms']);
         }
-        
+
         if (isset($filters['bathrooms'])) {
             $clean_filters['bathrooms'] = intval($filters['bathrooms']);
+        }
+
+        if (!empty($filters['reference'])) {
+            $clean_filters['reference'] = substr(preg_replace('/[^A-Za-z0-9\-]/', '', sanitize_text_field($filters['reference'])), 0, 50);
+        }
+
+        if (!empty($filters['has_elevator'])) {
+            $clean_filters['has_elevator'] = (bool) $filters['has_elevator'];
         }
         
         return $clean_filters;
@@ -353,16 +373,8 @@ class Inmovilla_Ajax {
      * Generar resumen de búsqueda
      */
     private function generate_search_summary($params, $count) {
-        $parts = array();
-        
-        if (!empty($params['type'])) {
-            $parts[] = $params['type'];
-        }
-        
-        if (!empty($params['city'])) {
-            $parts[] = __('en', 'inmovilla-properties') . ' ' . $params['city'];
-        }
-        
+        $summary_parts = array();
+
         if (!empty($params['min_price']) || !empty($params['max_price'])) {
             $price_range = '';
             if (!empty($params['min_price'])) {
@@ -371,11 +383,23 @@ class Inmovilla_Ajax {
             if (!empty($params['max_price'])) {
                 $price_range .= ' - ' . number_format($params['max_price'], 0, ',', '.') . '€';
             }
-            $parts[] = $price_range;
+            $summary_parts[] = $price_range;
         }
-        
-        $summary = implode(' ', $parts);
-        
+
+        if (!empty($params['bedrooms'])) {
+            $summary_parts[] = sprintf(__('≥ %d hab.', 'inmovilla-properties'), (int) $params['bedrooms']);
+        }
+
+        if (!empty($params['bathrooms'])) {
+            $summary_parts[] = sprintf(__('≥ %d baños', 'inmovilla-properties'), (int) $params['bathrooms']);
+        }
+
+        if (!empty($params['has_elevator'])) {
+            $summary_parts[] = __('con ascensor', 'inmovilla-properties');
+        }
+
+        $summary = implode(' · ', $summary_parts);
+
         return sprintf(
             _n(
                 '%d propiedad encontrada%s',

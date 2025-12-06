@@ -34,7 +34,13 @@ define('INMOVILLA_PROPERTIES_ASSETS_URL', INMOVILLA_PROPERTIES_PLUGIN_URL . 'ass
 // Definimos esta función aquí para que esté disponible globalmente antes de que se carguen las clases.
 if (!function_exists('inmovilla_get_setting')) {
     function inmovilla_get_setting($key, $default = null) {
-        $settings = get_option('inmovilla_properties_settings', array());
+        $settings = get_option('inmovilla_properties_options', array());
+
+        // Compatibilidad con instalaciones previas que usaban otro nombre de opción
+        if (empty($settings)) {
+            $settings = get_option('inmovilla_properties_settings', array());
+        }
+
         return isset($settings[$key]) ? $settings[$key] : $default;
     }
 }

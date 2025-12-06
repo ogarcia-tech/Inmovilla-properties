@@ -56,19 +56,24 @@
             $('#test-api-connection').on('click', function(e) {
                 e.preventDefault();
                 var $btn = $(this);
-                var apiToken = $('#inmovilla_api_token').val();
-
-                if (!apiToken) {
-                    InmovillaAdmin.showNotification('Introduce el token de API primero', 'warning');
-                    return;
-                }
-
                 $btn.prop('disabled', true).text('Probando...');
 
-                setTimeout(function() {
+                $.post(inmovilla_admin_ajax.ajax_url, {
+                    action: 'inmovilla_test_connection',
+                    nonce: inmovilla_admin_ajax.nonce
+                }).done(function(response) {
                     $btn.prop('disabled', false).text('Probar Conexión');
-                    InmovillaAdmin.showNotification('Conexión API probada', 'success');
-                }, 2000);
+
+                    if (response.success) {
+                        InmovillaAdmin.showNotification(response.data.message || 'Conexión API probada', 'success');
+                    } else {
+                        var message = (response.data && response.data.message) ? response.data.message : 'Error al probar la conexión';
+                        InmovillaAdmin.showNotification(message, 'error');
+                    }
+                }).fail(function() {
+                    $btn.prop('disabled', false).text('Probar Conexión');
+                    InmovillaAdmin.showNotification('Error al probar la conexión', 'error');
+                });
             });
         },
 

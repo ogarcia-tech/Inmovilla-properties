@@ -38,36 +38,65 @@ if (!defined('ABSPATH')) {
                 <table class="form-table" role="presentation">
                     <tr>
                         <th scope="row">
-                            <label for="api_token"><?php _e('Token API', 'inmovilla-properties'); ?></label>
+                            <label for="agency_id"><?php _e('Número de Agencia', 'inmovilla-properties'); ?></label>
                         </th>
                         <td>
-                            <input type="password" 
-                                   id="api_token" 
-                                   name="inmovilla_properties_options[api_token]" 
-                                   value="<?php echo esc_attr($this->options['api_token'] ?? ''); ?>" 
-                                   class="regular-text" 
-                                   required />
-                            <button type="button" class="button" onclick="togglePasswordVisibility('api_token')">
-                                <?php _e('Mostrar', 'inmovilla-properties'); ?>
-                            </button>
+                            <input type="number"
+                                   id="agency_id"
+                                   name="inmovilla_properties_options[agency_id]"
+                                   value="<?php echo esc_attr($this->options['agency_id'] ?? ''); ?>"
+                                   class="regular-text" />
                             <p class="description">
-                                <?php _e('Token obtenido desde Inmovilla → Ajustes → Opciones → Token para API Rest', 'inmovilla-properties'); ?>
+                                <?php _e('Número de agencia proporcionado por Inmovilla (ej: 2)', 'inmovilla-properties'); ?>
                             </p>
                         </td>
                     </tr>
-                    
+
+                    <tr>
+                        <th scope="row">
+                            <label for="api_password"><?php _e('Contraseña API', 'inmovilla-properties'); ?></label>
+                        </th>
+                        <td>
+                            <input type="password"
+                                   id="api_password"
+                                   name="inmovilla_properties_options[api_password]"
+                                   value="<?php echo esc_attr($this->options['api_password'] ?? ''); ?>"
+                                   class="regular-text" />
+                            <p class="description">
+                                <?php _e('Contraseña que acompaña al número de agencia', 'inmovilla-properties'); ?>
+                            </p>
+                        </td>
+                    </tr>
+
                     <tr>
                         <th scope="row">
                             <label for="api_base_url"><?php _e('URL Base API', 'inmovilla-properties'); ?></label>
                         </th>
                         <td>
-                            <input type="url" 
-                                   id="api_base_url" 
-                                   name="inmovilla_properties_options[api_base_url]" 
-                                   value="<?php echo esc_attr($this->options['api_base_url'] ?? 'https://crm.inmovilla.com/api/v1/'); ?>" 
+                            <input type="url"
+                                   id="api_base_url"
+                                   name="inmovilla_properties_options[api_base_url]"
+                                   value="<?php echo esc_attr($this->options['api_base_url'] ?? 'https://apiweb.inmovilla.com/apiweb/apiweb.php'); ?>"
                                    class="regular-text" />
                             <p class="description">
-                                <?php _e('URL base de la API de Inmovilla', 'inmovilla-properties'); ?>
+                                <?php _e('Endpoint legacy usado por Inmovilla (no RESTful)', 'inmovilla-properties'); ?>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">
+                            <label for="xml_feed_url"><?php _e('URL del Feed XML', 'inmovilla-properties'); ?></label>
+                        </th>
+                        <td>
+                            <input type="url"
+                                   id="xml_feed_url"
+                                   name="inmovilla_properties_options[xml_feed_url]"
+                                   value="<?php echo esc_attr($this->options['xml_feed_url'] ?? ''); ?>"
+                                   class="regular-text"
+                                   placeholder="https://procesos.inmovilla.com/xml/..." />
+                            <p class="description">
+                                <?php _e('Introduce la URL del archivo XML proporcionada por Inmovilla para la sincronización diaria.', 'inmovilla-properties'); ?>
                             </p>
                         </td>
                     </tr>
