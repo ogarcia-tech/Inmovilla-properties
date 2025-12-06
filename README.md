@@ -63,10 +63,13 @@ Propiedades destacadas.
 
 ## Configuración API
 
-1. En Inmovilla: Ajustes → Opciones → "Token para API Rest"
-2. Copiar el token generado
-3. En WordPress: Ajustes → Inmovilla Properties
-4. Pegar el token y guardar
+La API usada por este plugin es la clásica de Inmovilla basada en **Número de agencia + Contraseña** (no usa token REST).
+
+1. En la documentación del proveedor localiza tu **numagencia** y **contraseña** de la API (ej. numagencia `2`, contraseña `82ku9xz2aw3`).
+2. En WordPress ve a **Ajustes → Inmovilla Properties**.
+3. Introduce el número de agencia, un sufijo si tu cuenta lo requiere (ej. `_84`) y la contraseña API.
+4. Define el idioma (ID numérico de la tabla de idiomas de Inmovilla, por defecto `1` Español).
+5. Guarda los cambios y pulsa **Probar conexión API** para verificar.
 
 ## Sincronización
 
