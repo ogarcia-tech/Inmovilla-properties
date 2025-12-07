@@ -94,6 +94,26 @@ if (!defined('ABSPATH')) {
                         </td>
                     </tr>
                 </table>
+
+                <div class="inmovilla-sync-actions">
+                    <button type="button" id="inmovilla-sync-now" class="button button-primary">
+                        <?php _e('Forzar importación ahora', 'inmovilla-properties'); ?>
+                    </button>
+                    <p id="inmovilla-sync-status" class="description">
+                        <?php
+                        $last_sync = get_option('inmovilla_last_sync');
+                        if (!empty($last_sync)) {
+                            printf(
+                                /* translators: %s: formatted datetime */
+                                __('Última sincronización completada: %s', 'inmovilla-properties'),
+                                esc_html($last_sync)
+                            );
+                        } else {
+                            _e('Aún no se ha ejecutado ninguna sincronización.', 'inmovilla-properties');
+                        }
+                        ?>
+                    </p>
+                </div>
             </div>
 
             <!-- SEO Settings Tab -->
