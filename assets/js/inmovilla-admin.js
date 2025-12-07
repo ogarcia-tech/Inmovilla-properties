@@ -8,8 +8,8 @@
 
     window.InmovillaAdmin = {
         config: {
-            ajaxUrl: ajaxurl,
-            nonce: inmovilla_admin_object.nonce
+            ajaxUrl: inmovilla_admin_ajax.ajax_url,
+            nonce: inmovilla_admin_ajax.nonce
         },
 
         init: function() {
@@ -18,6 +18,7 @@
             this.setupFormValidation();
             this.setupApiTesting();
             this.setupCacheManagement();
+            this.setupManualSync();
             this.initDashboard();
         },
 
@@ -30,6 +31,40 @@
                 $('.inmovilla-tab-content').removeClass('active');
                 $('#' + targetTab).addClass('active');
                 localStorage.setItem('inmovilla_admin_active_tab', targetTab);
+            });
+        },
+
+        setupManualSync: function() {
+            var $button = $('#inmovilla-sync-now');
+            var $status = $('#inmovilla-sync-status');
+
+            if (!$button.length) {
+                return;
+            }
+
+            $button.on('click', function(e) {
+                e.preventDefault();
+
+                $button.prop('disabled', true).text('Sincronizando...');
+                $status.text('');
+
+                $.post(InmovillaAdmin.config.ajaxUrl, {
+                    action: 'inmovilla_sync_properties',
+                    nonce: InmovillaAdmin.config.nonce
+                }).done(function(response) {
+                    var message = response && response.data && response.data.message
+                        ? response.data.message
+                        : 'Sincronización completada.';
+
+                    InmovillaAdmin.showNotification(message, 'success');
+                    $status.text(message);
+                }).fail(function() {
+                    var errorMsg = 'Error al ejecutar la sincronización.';
+                    InmovillaAdmin.showNotification(errorMsg, 'error');
+                    $status.text(errorMsg);
+                }).always(function() {
+                    $button.prop('disabled', false).text('Forzar importación ahora');
+                });
             });
         },
 
