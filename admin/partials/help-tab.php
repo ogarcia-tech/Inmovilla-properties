@@ -111,7 +111,7 @@ if (!defined('ABSPATH')) {
             <div class="support-info">
                 <p><?php _e('Si necesitas ayuda adicional, proporciona la siguiente información:', 'inmovilla-properties'); ?></p>
                 <ul>
-                    <li><strong><?php _e('Versión del plugin:', 'inmovilla-properties'); ?></strong> <?php echo INMOVILLA_VERSION; ?></li>
+                    <li><strong><?php _e('Versión del plugin:', 'inmovilla-properties'); ?></strong> <?php echo INMOVILLA_PROPERTIES_VERSION; ?></li>
                     <li><strong><?php _e('Versión de WordPress:', 'inmovilla-properties'); ?></strong> <?php echo get_bloginfo('version'); ?></li>
                     <li><strong><?php _e('Versión de PHP:', 'inmovilla-properties'); ?></strong> <?php echo PHP_VERSION; ?></li>
                     <li><strong><?php _e('Tema activo:', 'inmovilla-properties'); ?></strong> <?php echo wp_get_theme()->get('Name'); ?></li>
@@ -121,7 +121,7 @@ if (!defined('ABSPATH')) {
                     <h4><?php _e('Información de Debug:', 'inmovilla-properties'); ?></h4>
                     <textarea readonly rows="10" cols="80"><?php
                         $debug_info = array(
-                            'Plugin Version' => INMOVILLA_VERSION,
+                            'Plugin Version' => INMOVILLA_PROPERTIES_VERSION,
                             'WordPress Version' => get_bloginfo('version'),
                             'PHP Version' => PHP_VERSION,
                             'Active Theme' => wp_get_theme()->get('Name'),

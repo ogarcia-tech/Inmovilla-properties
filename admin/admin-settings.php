@@ -30,24 +30,6 @@ class Inmovilla_Admin_Settings {
             'dashicons-admin-home',
             30
         );
-        
-        add_submenu_page(
-            'inmovilla-properties',
-            __('Configuración', 'inmovilla-properties'),
-            __('Configuración', 'inmovilla-properties'),
-            'manage_options',
-            'inmovilla-properties-settings',
-            array($this, 'settings_page')
-        );
-        
-        add_submenu_page(
-            'inmovilla-properties',
-            __('Dashboard', 'inmovilla-properties'),
-            __('Dashboard', 'inmovilla-properties'),
-            'manage_options',
-            'inmovilla-properties-dashboard',
-            array($this, 'dashboard_page')
-        );
     }
     
     /**
@@ -55,17 +37,17 @@ class Inmovilla_Admin_Settings {
      */
     public function enqueue_admin_scripts($hook) {
         if (strpos($hook, 'inmovilla-properties') !== false) {
-            wp_enqueue_script('inmovilla-admin-js', 
-                INMOVILLA_PLUGIN_URL . 'assets/js/inmovilla-admin.js', 
-                array('jquery'), 
-                INMOVILLA_VERSION, 
+            wp_enqueue_script('inmovilla-admin-js',
+                INMOVILLA_PROPERTIES_ASSETS_URL . 'js/inmovilla-admin.js',
+                array('jquery'),
+                INMOVILLA_PROPERTIES_VERSION,
                 true
             );
-            
-            wp_enqueue_style('inmovilla-admin-css', 
-                INMOVILLA_PLUGIN_URL . 'assets/css/inmovilla-admin.css', 
-                array(), 
-                INMOVILLA_VERSION
+
+            wp_enqueue_style('inmovilla-admin-css',
+                INMOVILLA_PROPERTIES_ASSETS_URL . 'css/inmovilla-admin.css',
+                array(),
+                INMOVILLA_PROPERTIES_VERSION
             );
             
             wp_localize_script('inmovilla-admin-js', 'inmovilla_admin_ajax', array(
@@ -112,31 +94,15 @@ class Inmovilla_Admin_Settings {
             'inmovilla_properties_settings',
             'inmovilla_api_section'
         );
-        
-        // Sección Diseño
-        add_settings_section(
-            'inmovilla_design_section',
-            __('Configuración de Diseño', 'inmovilla-properties'),
-            array($this, 'design_section_callback'),
-            'inmovilla_properties_settings'
-        );
-        
+
         add_settings_field(
-            'primary_color',
-            __('Color Primario', 'inmovilla-properties'),
-            array($this, 'primary_color_callback'),
+            'xml_feed_url',
+            __('URL del Feed XML', 'inmovilla-properties'),
+            array($this, 'xml_feed_url_callback'),
             'inmovilla_properties_settings',
-            'inmovilla_design_section'
+            'inmovilla_api_section'
         );
-        
-        add_settings_field(
-            'secondary_color',
-            __('Color Secundario', 'inmovilla-properties'),
-            array($this, 'secondary_color_callback'),
-            'inmovilla_properties_settings',
-            'inmovilla_design_section'
-        );
-        
+
         // Sección SEO
         add_settings_section(
             'inmovilla_seo_section',
@@ -161,25 +127,14 @@ class Inmovilla_Admin_Settings {
         $this->options = get_option('inmovilla_properties_options');
         include INMOVILLA_PROPERTIES_PLUGIN_DIR . 'admin/partials/settings-form.php';
     }
-    
-    /**
-     * Página de dashboard
-     */
-    public function dashboard_page() {
-        include INMOVILLA_PROPERTIES_PLUGIN_DIR . 'admin/admin-dashboard.php';
-    }
-    
+
     /**
      * Callbacks de secciones
      */
     public function api_section_callback() {
         echo '<p>' . __('Configuración de conexión con la API de Inmovilla', 'inmovilla-properties') . '</p>';
     }
-    
-    public function design_section_callback() {
-        echo '<p>' . __('Personalización del diseño y colores corporativos', 'inmovilla-properties') . '</p>';
-    }
-    
+
     public function seo_section_callback() {
         echo '<p>' . __('Configuración para optimización SEO', 'inmovilla-properties') . '</p>';
     }
@@ -216,27 +171,17 @@ class Inmovilla_Admin_Settings {
             __('Endpoint clásico de Inmovilla (param + json=1)', 'inmovilla-properties')
         );
     }
-    
-    public function primary_color_callback() {
-        $value = isset($this->options['primary_color']) ? $this->options['primary_color'] : '#2563eb';
+
+    public function xml_feed_url_callback() {
+        $value = isset($this->options['xml_feed_url']) ? $this->options['xml_feed_url'] : '';
         printf(
-            '<input type="color" id="primary_color" name="inmovilla_properties_options[primary_color]" value="%s" />
+            '<input type="url" id="xml_feed_url" name="inmovilla_properties_options[xml_feed_url]" value="%s" class="regular-text" placeholder="https://procesos.inmovilla.com/xml/..." />
             <p class="description">%s</p>',
             esc_attr($value),
-            __('Color principal utilizado en botones y enlaces', 'inmovilla-properties')
+            __('Introduce la URL completa del feed XML que Inmovilla genera para tu agencia.', 'inmovilla-properties')
         );
     }
-    
-    public function secondary_color_callback() {
-        $value = isset($this->options['secondary_color']) ? $this->options['secondary_color'] : '#64748b';
-        printf(
-            '<input type="color" id="secondary_color" name="inmovilla_properties_options[secondary_color]" value="%s" />
-            <p class="description">%s</p>',
-            esc_attr($value),
-            __('Color secundario utilizado en textos y fondos', 'inmovilla-properties')
-        );
-    }
-    
+
     public function base_slug_callback() {
         $value = isset($this->options['base_slug']) ? $this->options['base_slug'] : 'propiedades';
         printf(
@@ -251,7 +196,7 @@ class Inmovilla_Admin_Settings {
      * Test de conexión API
      */
     public function test_api_connection() {
-        $api = new Inmovilla_API();
+        $api = new InmovillaAPI();
         $test = $api->test_connection();
         
         if ($test['success']) {

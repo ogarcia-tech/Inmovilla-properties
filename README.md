@@ -23,6 +23,11 @@ Plugin profesional para conectar WordPress con Inmovilla CRM. Incluye URLs SEO-f
 4. Introducir número de agencia, contraseña y URL del XML proporcionado por Inmovilla
 5. ¡Listo para usar!
 
+📌 **¿Dónde pegar la URL del XML?**
+- En el panel de WordPress, ve a **Ajustes → Inmovilla Properties**.
+- En la pestaña **API**, encontrarás el campo **“URL del Feed XML”** justo debajo de “URL Base API”.
+- Pega ahí la URL completa de tu feed (ej. `https://procesos.inmovilla.com/xml/xml2demo/2-web.xml`).
+
 ## Shortcodes Disponibles
 
 ### [inmovilla_properties]
@@ -103,6 +108,10 @@ Los siguientes metadatos están disponibles como *Dynamic Tags* en Elementor par
 ## Soporte
 
 Para soporte técnico o consultas, contacta con el desarrollador del plugin.
+
+## Información de desarrollo
+
+La versión **2.0** del plugin ha sido desarrollada por **Metricaweb**. Puedes obtener más información en [www.metricaweb.es](https://www.metricaweb.es).
 
 ## Changelog
 
