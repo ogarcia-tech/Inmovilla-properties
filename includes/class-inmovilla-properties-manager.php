@@ -90,28 +90,51 @@ class Inmovilla_Properties_Manager {
      * Mapea los nodos del XML a un array estándar
      */
     private function parse_xml_node($node) {
-        $reference = (string) ($node->referencia ?? '');
-        $identifier = (string) ($node->codigo ?? $reference);
+        $reference = (string) ($node->referencia
+            ?? $node->ref
+            ?? '');
+
+        $identifier = (string) ($node->codigo
+            ?? $node->id
+            ?? $reference);
 
         if (empty($identifier) && empty($reference)) {
             return null;
         }
 
-        $venta = (float) ($node->precio_venta ?? 0);
-        $alquiler = (float) ($node->precio_alquiler ?? 0);
+        $venta = (float) ($node->precio_venta
+            ?? $node->precioinmo
+            ?? 0);
+        $alquiler = (float) ($node->precio_alquiler
+            ?? $node->precioalq
+            ?? 0);
         $price = $venta > 0 ? $venta : $alquiler;
 
         $images = $this->extract_images($node);
 
         $title_parts = array();
-        if (!empty($node->tipo)) {
-            $title_parts[] = (string) $node->tipo;
+        $property_type = (string) ($node->tipo
+            ?? $node->tipo_ofer
+            ?? '');
+
+        if (!empty($property_type)) {
+            $title_parts[] = $property_type;
         }
-        if (!empty($node->poblacion)) {
-            $title_parts[] = __('en', 'inmovilla-properties') . ' ' . (string) $node->poblacion;
+        $city = (string) ($node->poblacion
+            ?? $node->ciudad
+            ?? '');
+
+        if (!empty($city)) {
+            $title_parts[] = __('en', 'inmovilla-properties') . ' ' . $city;
         }
 
-        $title = trim(implode(' ', $title_parts));
+        $title_from_xml = (string) ($node->titulo1
+            ?? $node->titulo
+            ?? '');
+
+        $title = !empty($title_from_xml)
+            ? $title_from_xml
+            : trim(implode(' ', $title_parts));
         if (empty($title)) {
             $title = sprintf(__('Propiedad %s', 'inmovilla-properties'), $reference ?: $identifier);
         }
@@ -120,14 +143,24 @@ class Inmovilla_Properties_Manager {
             'id_inmovilla' => $identifier,
             'reference'    => $reference ?: $identifier,
             'title'        => $title,
-            'description'  => (string) ($node->descripcion ?? ''),
+            'description'  => (string) ($node->descripcion
+                ?? $node->descrip1
+                ?? ''),
             'price'        => $price,
-            'type'         => (string) ($node->tipo ?? ''),
-            'city'         => (string) ($node->poblacion ?? ''),
+            'type'         => $property_type,
+            'city'         => $city,
             'zone'         => (string) ($node->zona ?? ''),
-            'bedrooms'     => (int) ($node->habitaciones ?? 0),
-            'bathrooms'    => (int) ($node->banos ?? 0),
-            'size'         => (float) ($node->superficie_construida ?? 0),
+            'bedrooms'     => (int) max(
+                (int) ($node->habitaciones ?? 0),
+                (int) ($node->habdobles ?? 0)
+            ),
+            'bathrooms'    => (int) ($node->banos
+                ?? $node->banyos
+                ?? $node->aseos
+                ?? 0),
+            'size'         => (float) ($node->superficie_construida
+                ?? $node->m_cons
+                ?? 0),
             'images'       => $images,
             'raw'          => json_decode(json_encode($node), true),
         );
@@ -144,6 +177,17 @@ class Inmovilla_Properties_Manager {
                 $url = trim((string) $foto);
                 if (!empty($url)) {
                     $images[] = $url;
+                }
+            }
+        }
+
+        if (empty($images)) {
+            foreach ($node as $key => $value) {
+                if (preg_match('/^foto\d+$/i', $key)) {
+                    $url = trim((string) $value);
+                    if (!empty($url)) {
+                        $images[] = $url;
+                    }
                 }
             }
         }

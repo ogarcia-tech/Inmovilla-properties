@@ -81,6 +81,29 @@ La API usada por este plugin es la clásica de Inmovilla basada en **Número de 
 
 El proceso de sincronización diaria lee el **XML completo** y crea/actualiza los posts `inmovilla_property` en WordPress (incluyendo imagen destacada y meta datos). Se ejecuta mediante WP-Cron (intervalo diario por defecto) y elimina las propiedades que ya no aparecen en el feed.
 
+### Cómo activarla y probarla
+
+1. En **Ajustes → Inmovilla Properties** pega la **URL del feed XML** y guarda.
+2. Asegúrate de que WP-Cron está habilitado (valor por defecto en WordPress). El hook registrado es `inmovilla_sync_properties` con periodicidad diaria.
+3. Para lanzar la importación de inmediato sin esperar al cron ejecuta:
+   - Desde WP-CLI: `wp cron event run inmovilla_sync_properties`
+   - Desde PHP (por ejemplo en un snippet): `do_action('inmovilla_sync_properties');`
+
+### Esquema XML admitido
+
+El importador entiende tanto feeds con nodos `<propiedad>` como `<inmueble>`. Las claves más importantes que se usan para crear la ficha son:
+- Identificador: `id`, `codigo` o `ref`.
+- Precio: `precio_venta`, `precioinmo`, `precio_alquiler` o `precioalq`.
+- Título/Tipo/Ubicación: `tipo` o `tipo_ofer`, `ciudad` o `poblacion`, `zona`.
+- Habitaciones y baños: `habitaciones`/`habdobles` y `banos`/`banyos`/`aseos`.
+- Superficie: `superficie_construida` o `m_cons`.
+- Descripción/Título: `descripcion` o `descrip1`, `titulo1` si viene informativo.
+- Fotos: `<fotos><foto>...</foto></fotos>` o campos `foto1`, `foto2`, etc.
+
+### Gestión de imágenes
+
+Las URLs de imágenes del feed se guardan en el metadato `gallery_images`. Además, la primera imagen se descarga y se asigna como **imagen destacada** del CPT `inmovilla_property` mediante `media_handle_sideload`, quedando disponible en la biblioteca de medios de WordPress.
+
 ## URLs SEO
 
 El plugin genera URLs amigables automáticamente:
