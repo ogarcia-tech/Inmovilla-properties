@@ -2,9 +2,9 @@
 /**
  * Plugin Name: Inmovilla Properties
  * Plugin URI: https://github.com/tuempresa/inmovilla-properties
- * Version: 2.0.3-final-fix
- * Author: Tu Empresa
- * Author URI: https://tuempresa.com
+ * Version: 2.0
+ * Author: Metricaweb
+ * Author URI: https://metricaweb.es
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: inmovilla-properties
