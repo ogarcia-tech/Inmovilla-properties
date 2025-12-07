@@ -14,7 +14,6 @@ if (!defined('ABSPATH')) {
     <form id="inmovilla-settings-form" method="post" action="options.php">
         <?php
         settings_fields('inmovilla_properties_settings');
-        do_settings_sections('inmovilla_properties_settings');
         ?>
 
         <div class="inmovilla-settings-tabs">
