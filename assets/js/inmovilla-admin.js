@@ -52,11 +52,16 @@
                     action: 'inmovilla_sync_properties',
                     nonce: InmovillaAdmin.config.nonce
                 }).done(function(response) {
+                    var defaultSuccess = 'Sincronización completada.';
+                    var defaultError = 'No se pudo completar la sincronización.';
+
+                    var isSuccess = response && response.success;
                     var message = response && response.data && response.data.message
                         ? response.data.message
-                        : 'Sincronización completada.';
+                        : (isSuccess ? defaultSuccess : defaultError);
 
-                    InmovillaAdmin.showNotification(message, 'success');
+                    var type = isSuccess ? 'success' : 'error';
+                    InmovillaAdmin.showNotification(message, type);
                     $status.text(message);
                 }).fail(function() {
                     var errorMsg = 'Error al ejecutar la sincronización.';
