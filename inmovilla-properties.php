@@ -66,17 +66,12 @@ final class InmovillaProperties {
     }
 
     private function includes() {
-        require_once INMOVILLA_PROPERTIES_INCLUDES_DIR . 'class-inmovilla-api.php';
-        require_once INMOVILLA_PROPERTIES_INCLUDES_DIR . 'class-inmovilla-cache.php';
         require_once INMOVILLA_PROPERTIES_INCLUDES_DIR . 'class-inmovilla-properties-manager.php';
         require_once INMOVILLA_PROPERTIES_INCLUDES_DIR . 'class-inmovilla-shortcodes.php';
         require_once INMOVILLA_PROPERTIES_INCLUDES_DIR . 'class-inmovilla-seo.php';
         require_once INMOVILLA_PROPERTIES_INCLUDES_DIR . 'class-inmovilla-sitemap.php';
-        require_once INMOVILLA_PROPERTIES_INCLUDES_DIR . 'class-inmovilla-favorites.php';
-        require_once INMOVILLA_PROPERTIES_INCLUDES_DIR . 'class-inmovilla-search.php';
         require_once INMOVILLA_PROPERTIES_PLUGIN_DIR . 'public/class-inmovilla-public.php';
-        require_once INMOVILLA_PROPERTIES_PLUGIN_DIR . 'public/class-inmovilla-ajax.php';
-        
+
         if (is_admin()) {
             require_once INMOVILLA_PROPERTIES_PLUGIN_DIR . 'admin/admin-settings.php';
         }
@@ -95,10 +90,7 @@ final class InmovillaProperties {
         new InmovillaShortcodes();
         new InmovillaSEO();
         new InmovillaSitemap();
-        new InmovillaFavorites();
-        new InmovillaSearch();
         new Inmovilla_Public();
-        new Inmovilla_Ajax();
         if (is_admin()) {
             new Inmovilla_Admin_Settings();
         }

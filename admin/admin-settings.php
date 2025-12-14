@@ -71,25 +71,4 @@ class Inmovilla_Admin_Settings {
         $this->options = get_option('inmovilla_properties_options');
         include INMOVILLA_PROPERTIES_PLUGIN_DIR . 'admin/partials/settings-form.php';
     }
-    
-    /**
-     * Test de conexión API
-     */
-    public function test_api_connection() {
-        $api = new InmovillaAPI();
-        $test = $api->test_connection();
-        
-        if ($test['success']) {
-            return array(
-                'status' => 'success',
-                'message' => __('Conexión exitosa con la API de Inmovilla', 'inmovilla-properties'),
-                'data' => $test['data']
-            );
-        } else {
-            return array(
-                'status' => 'error',
-                'message' => $test['message']
-            );
-        }
-    }
 }

@@ -35,18 +35,10 @@ class Inmovilla_Public {
         );
         
         // JavaScript principal
-        wp_enqueue_script('inmovilla-public', 
-            INMOVILLA_PROPERTIES_PLUGIN_URL . 'assets/js/inmovilla-public.js', 
-            array('jquery'), 
-            INMOVILLA_PROPERTIES_VERSION, 
-            true
-        );
-        
-        // JavaScript para búsquedas
-        wp_enqueue_script('inmovilla-search', 
-            INMOVILLA_PROPERTIES_PLUGIN_URL . 'assets/js/inmovilla-search.js', 
-            array('jquery', 'inmovilla-public'), 
-            INMOVILLA_PROPERTIES_VERSION, 
+        wp_enqueue_script('inmovilla-public',
+            INMOVILLA_PROPERTIES_PLUGIN_URL . 'assets/js/inmovilla-public.js',
+            array('jquery'),
+            INMOVILLA_PROPERTIES_VERSION,
             true
         );
         
