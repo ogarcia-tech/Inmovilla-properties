@@ -15,6 +15,7 @@ class Inmovilla_Admin_Settings {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'settings_init'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
+        add_action('wp_ajax_inmovilla_sync_properties', array($this, 'ajax_sync_properties'));
     }
     
     /**
@@ -70,5 +71,36 @@ class Inmovilla_Admin_Settings {
     public function settings_page() {
         $this->options = get_option('inmovilla_properties_options');
         include INMOVILLA_PROPERTIES_PLUGIN_DIR . 'admin/partials/settings-form.php';
+    }
+
+    /**
+     * Ejecuta la sincronización manual desde AJAX
+     */
+    public function ajax_sync_properties() {
+        check_ajax_referer('inmovilla_admin_nonce', 'nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array(
+                'message' => __('No tienes permisos para ejecutar la sincronización.', 'inmovilla-properties')
+            ), 403);
+        }
+
+        $xml_feed_url = inmovilla_get_setting('xml_feed_url');
+
+        if (empty($xml_feed_url)) {
+            wp_send_json_error(array(
+                'message' => __('Configura la URL del feed XML antes de sincronizar.', 'inmovilla-properties')
+            ));
+        }
+
+        /**
+         * Disparamos el hook principal de sincronización.
+         * La clase Inmovilla_Properties_Manager se encarga de procesar el feed.
+         */
+        do_action('inmovilla_sync_properties');
+
+        wp_send_json_success(array(
+            'message' => __('Sincronización completada correctamente.', 'inmovilla-properties')
+        ));
     }
 }
