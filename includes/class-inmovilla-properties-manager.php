@@ -326,6 +326,34 @@ class Inmovilla_Properties_Manager {
         // Multimedia (solo los códigos/URLs)
         update_post_meta($post_id, 'inmovilla_gallery_urls', $data['images']);
         update_post_meta($post_id, 'inmovilla_video_codes', $data['video_codes']);
+        // 1. URLs de Galería
+if (!empty($data['images'])) {
+    $gallery_rows = [];
+    foreach ($data['images'] as $url) {
+        // Formatea el array al estilo ACF: [ [ 'url' => '...url...' ], [ 'url' => '...url...' ] ]
+        $gallery_rows[] = ['url' => $url];
+    }
+    // Usamos update_field para guardar el Repetidor correctamente
+    update_field('inmovilla_gallery_urls', $gallery_rows, $post_id);
+} else {
+    // Asegura que el campo se vacíe si no hay imágenes
+    update_field('inmovilla_gallery_urls', false, $post_id);
+}
+
+
+// 2. Códigos de Video
+if (!empty($data['video_codes'])) {
+    $video_rows = [];
+    foreach ($data['video_codes'] as $code) {
+        // Formatea el array al estilo ACF: [ [ 'code' => '...code...' ], [ 'code' => '...code...' ] ]
+        $video_rows[] = ['code' => $code];
+    }
+    // Usamos update_field para guardar el Repetidor correctamente
+    update_field('inmovilla_video_codes', $video_rows, $post_id);
+} else {
+    // Asegura que el campo se vacíe si no hay videos
+    update_field('inmovilla_video_codes', false, $post_id);
+}
 
         // Guardar datos crudos
         update_post_meta($post_id, 'raw_data', $data['raw']);
