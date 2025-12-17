@@ -65,7 +65,7 @@ class Inmovilla_Properties_Manager {
             $properties_nodes = $xml->inmueble;
         }
 
-        $active_ids = array();
+        $active_refs = array();
 
         foreach ($properties_nodes as $property_node) {
             $prop_data = $this->parse_xml_node($property_node);
@@ -74,13 +74,13 @@ class Inmovilla_Properties_Manager {
                 $post_id = $this->create_or_update_property($prop_data);
 
                 if ($post_id) {
-                    $active_ids[] = $prop_data['id_inmovilla'];
+                    $active_refs[] = sanitize_text_field($prop_data['reference']);
                 }
             }
         }
 
-        if (!empty($active_ids)) {
-            $this->cleanup_old_properties($active_ids);
+        if (!empty($active_refs)) {
+            $this->cleanup_old_properties($active_refs);
         }
 
         update_option('inmovilla_last_sync', current_time('mysql'));
@@ -136,9 +136,9 @@ class Inmovilla_Properties_Manager {
      * Mapea los nodos del XML a un array estándar (EXPANDIDO)
      */
     private function parse_xml_node($node) {
-        $reference = (string) ($node->referencia
+        $reference = trim((string) ($node->referencia
             ?? $node->ref
-            ?? '');
+            ?? ''));
 
         $identifier = (string) ($node->codigo
             ?? $node->id
@@ -256,27 +256,31 @@ class Inmovilla_Properties_Manager {
      * Crea o actualiza el Post en WordPress y mapea a los campos ACF (ACTUALIZADO)
      */
     private function create_or_update_property($data) {
+        $reference = sanitize_text_field($data['reference']);
+
         $existing = get_posts(array(
             'post_type'      => 'inmovilla_property',
-            'meta_key'       => '_inmovilla_id',
-            'meta_value'     => $data['id_inmovilla'],
+            'meta_key'       => 'inmovilla_ref',
+            'meta_value'     => $reference,
             'posts_per_page' => 1,
             'fields'         => 'ids',
+            'post_status'    => 'any',
         ));
 
+        if (empty($existing)) {
+            error_log(sprintf('Inmovilla: propiedad con referencia %s no encontrada para actualizar.', $reference));
+            return false;
+        }
+
         $post_args = array(
+            'ID'           => $existing[0],
             'post_title'   => sanitize_text_field($data['title']),
             'post_content' => wp_kses_post($data['description']),
             'post_status'  => 'publish',
             'post_type'    => 'inmovilla_property',
         );
 
-        if (!empty($existing)) {
-            $post_args['ID'] = $existing[0];
-            $post_id = wp_update_post($post_args);
-        } else {
-            $post_id = wp_insert_post($post_args);
-        }
+        $post_id = wp_update_post($post_args);
 
         if (is_wp_error($post_id) || !$post_id) {
             return false;
@@ -285,10 +289,10 @@ class Inmovilla_Properties_Manager {
         // --- Mapeo de Campos ACF (usando update_post_meta con tus claves ACF) ---
 
         // Clave interna del plugin (No tocar)
-        update_post_meta($post_id, '_inmovilla_id', $data['id_inmovilla']); 
+        update_post_meta($post_id, '_inmovilla_id', $data['id_inmovilla']);
 
         // Identificación y Precios
-        update_post_meta($post_id, 'inmovilla_ref', $data['reference']);
+        update_post_meta($post_id, 'inmovilla_ref', $reference);
         update_post_meta($post_id, 'inmovilla_cod_ofer', $data['id_inmovilla']);
         update_post_meta($post_id, 'inmovilla_precioinmo', $data['price_sale']);
         update_post_meta($post_id, 'inmovilla_precioalq', $data['price_rent']);
@@ -431,7 +435,7 @@ if (!empty($data['video_codes'])) {
     /**
      * Eliminar propiedades que ya no están en el XML
      */
-    private function cleanup_old_properties($active_ids) {
+    private function cleanup_old_properties($active_refs) {
         $all_posts = get_posts(array(
             'post_type'      => 'inmovilla_property',
             'posts_per_page' => -1,
@@ -439,8 +443,17 @@ if (!empty($data['video_codes'])) {
         ));
 
         foreach ($all_posts as $post_id) {
-            $inmo_id = get_post_meta($post_id, '_inmovilla_id', true);
-            if (!in_array($inmo_id, $active_ids, true)) {
+            $reference = get_post_meta($post_id, 'inmovilla_ref', true);
+
+            if (empty($reference)) {
+                $reference = get_post_meta($post_id, '_inmovilla_id', true);
+            }
+
+            if (empty($reference)) {
+                continue;
+            }
+
+            if (!in_array($reference, $active_refs, true)) {
                 wp_delete_post($post_id, true);
             }
         }

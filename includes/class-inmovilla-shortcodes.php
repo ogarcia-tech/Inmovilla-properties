@@ -101,6 +101,11 @@ class InmovillaShortcodes {
                 $template_path = INMOVILLA_PROPERTIES_PLUGIN_DIR . 'templates/property-card.php';
                 if (file_exists($template_path)) {
                     include $template_path;
+                } else {
+                    echo '<article class="inmovilla-property">';
+                    echo '<h2 class="inmovilla-property__title"><a href="' . esc_url(get_permalink()) . '">' . esc_html(get_the_title()) . '</a></h2>';
+                    echo '<div class="inmovilla-property__excerpt">' . wp_kses_post(wp_trim_words(get_the_content(), 30)) . '</div>';
+                    echo '</article>';
                 }
             }
 

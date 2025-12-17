@@ -26,7 +26,6 @@ define('INMOVILLA_PROPERTIES_PLUGIN_FILE', __FILE__);
 define('INMOVILLA_PROPERTIES_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('INMOVILLA_PROPERTIES_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('INMOVILLA_PROPERTIES_INCLUDES_DIR', INMOVILLA_PROPERTIES_PLUGIN_DIR . 'includes/');
-define('INMOVILLA_PROPERTIES_TEMPLATES_DIR', INMOVILLA_PROPERTIES_PLUGIN_DIR . 'templates/');
 define('INMOVILLA_PROPERTIES_ASSETS_URL', INMOVILLA_PROPERTIES_PLUGIN_URL . 'assets/');
 
 
@@ -68,7 +67,6 @@ final class InmovillaProperties {
     private function includes() {
         require_once INMOVILLA_PROPERTIES_INCLUDES_DIR . 'class-inmovilla-properties-manager.php';
         require_once INMOVILLA_PROPERTIES_INCLUDES_DIR . 'class-inmovilla-shortcodes.php';
-        require_once INMOVILLA_PROPERTIES_INCLUDES_DIR . 'class-inmovilla-seo.php';
         require_once INMOVILLA_PROPERTIES_INCLUDES_DIR . 'class-inmovilla-sitemap.php';
         require_once INMOVILLA_PROPERTIES_PLUGIN_DIR . 'public/class-inmovilla-public.php';
 
@@ -88,7 +86,6 @@ final class InmovillaProperties {
         $this->register_post_types_and_taxonomies();
         new Inmovilla_Properties_Manager();
         new InmovillaShortcodes();
-        new InmovillaSEO();
         new InmovillaSitemap();
         new Inmovilla_Public();
         if (is_admin()) {
@@ -110,21 +107,13 @@ final class InmovillaProperties {
         add_action('init', function() {
             register_post_type('inmovilla_property', array(
                 'labels' => array(
-                    'name' => __('Propiedades', 'inmovilla-properties'), 
+                    'name' => __('Propiedades', 'inmovilla-properties'),
                     'singular_name' => __('Propiedad', 'inmovilla-properties'),
                     'menu_name' => __('Propiedades Inmovilla', 'inmovilla-properties'),
                 ),
                 'public' => true, 'publicly_queryable' => true, 'show_ui' => true, 'show_in_menu' => true,
                 'menu_icon' => 'dashicons-admin-home', 'query_var' => true, 'rewrite' => array('slug' => 'propiedades'),
                 'has_archive' => true, 'supports' => array('title', 'editor', 'thumbnail', 'custom-fields'), 'show_in_rest' => true,
-            ));
-            register_taxonomy('property_type', 'inmovilla_property', array(
-                'labels' => array('name' => __('Tipos de Propiedad', 'inmovilla-properties')), 'hierarchical' => true, 'public' => true,
-                'show_ui' => true, 'rewrite' => array('slug' => 'tipo'), 'show_in_rest' => true,
-            ));
-            register_taxonomy('property_location', 'inmovilla_property', array(
-                'labels' => array('name' => __('Ubicaciones', 'inmovilla-properties')), 'hierarchical' => true, 'public' => true,
-                'show_ui' => true, 'rewrite' => array('slug' => 'ubicacion'), 'show_in_rest' => true,
             ));
         }, 0); // Prioridad 0 para asegurar que se ejecuta pronto
     }
