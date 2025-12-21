@@ -1,6 +1,6 @@
 <?php
 /**
- * Gestión de propiedades mediante Sincronización XML con soporte API e Historial
+ * Gestión de propiedades mediante Sincronización XML (Versión Final Integrada)
  */
 
 if (!defined('ABSPATH')) {
@@ -23,48 +23,26 @@ class Inmovilla_Properties_Manager {
         $this->sync_properties_from_xml();
     }
 
-    /**
-     * Sincronización XML Principal con control de duplicados e Historial
-     */
     public function sync_properties_from_xml() {
         @set_time_limit(0);
         @ini_set('memory_limit', '512M');
 
         $xml_url = inmovilla_get_setting('xml_feed_url');
-
-        if (empty($xml_url)) {
-            error_log('Inmovilla: No se ha configurado la URL del XML.');
-            return;
-        }
+        if (empty($xml_url)) return;
 
         $xml_response = wp_remote_get($xml_url, array('timeout' => 300));
+        if (is_wp_error($xml_response)) return;
 
-        if (is_wp_error($xml_response)) {
-            error_log('Inmovilla: Error descargando XML - ' . $xml_response->get_error_message());
-            return;
-        }
+        $xml = simplexml_load_string(wp_remote_retrieve_body($xml_response));
+        if ($xml === false) return;
 
-        $body = wp_remote_retrieve_body($xml_response);
-        libxml_use_internal_errors(true);
-        $xml = simplexml_load_string($body);
-
-        if ($xml === false) {
-            error_log('Inmovilla: XML inválido o corrupto.');
-            return;
-        }
-
-        $properties_nodes = array();
-        if (isset($xml->propiedad)) {
-            $properties_nodes = $xml->propiedad;
-        } elseif (isset($xml->inmueble)) {
-            $properties_nodes = $xml->inmueble;
-        }
-
+        $properties_nodes = isset($xml->propiedad) ? $xml->propiedad : (isset($xml->inmueble) ? $xml->inmueble : array());
+        
         $stats = ['nuevas' => 0, 'actualizadas' => 0];
         $active_refs = array();
 
-        foreach ($properties_nodes as $property_node) {
-            $prop_data = $this->parse_xml_node($property_node);
+        foreach ($properties_nodes as $node) {
+            $prop_data = $this->parse_xml_node($node);
             if ($prop_data) {
                 $result = $this->create_or_update_property($prop_data);
                 if ($result) {
@@ -75,24 +53,18 @@ class Inmovilla_Properties_Manager {
             }
         }
 
-        // Registrar en el historial y limpiar antiguas
         $this->add_to_history($stats['nuevas'], $stats['actualizadas'], count($active_refs));
         if (!empty($active_refs)) {
             $this->cleanup_old_properties($active_refs);
         }
-
         update_option('inmovilla_last_sync', current_time('mysql'));
     }
 
-    /**
-     * Actualización de un único inmueble llamando a la API
-     */
     public function update_single_property_via_api($post_id) {
         $ref = get_post_meta($post_id, 'inmovilla_ref', true);
         $agencia = inmovilla_get_setting('numagencia', '2');
         $pass = inmovilla_get_setting('api_password', '82ku9xz2aw3');
         
-        // Llamada a la API JSON para refrescar datos críticos
         $api_url = "https://apiweb.inmovilla.com/apiweb/apiweb.php?numagencia=$agencia&password=$pass&idioma=1&tipo=propiedad&where=ref='$ref'";
         
         $response = wp_remote_get($api_url);
@@ -102,8 +74,6 @@ class Inmovilla_Properties_Manager {
         if (empty($data[0])) return false;
 
         $item = $data[0];
-
-        // Actualizamos solo campos clave vía API
         update_post_meta($post_id, 'inmovilla_precioinmo', $item['precioinmo']);
         update_post_meta($post_id, 'inmovilla_outlet', $item['outlet'] ?? 0);
         
@@ -124,7 +94,7 @@ class Inmovilla_Properties_Manager {
             'actualizadas' => $actualizadas,
             'total' => $total
         ]);
-        update_option('inmovilla_sync_history', array_slice($history, 0, 10)); // Guardar últimas 10
+        update_option('inmovilla_sync_history', array_slice($history, 0, 10));
     }
 
     private function extract_videos($node) {
@@ -161,9 +131,7 @@ class Inmovilla_Properties_Manager {
         $reference = trim((string) ($node->referencia ?? $node->ref ?? ''));
         $identifier = (string) ($node->codigo ?? $node->id ?? $node->cod_ofer ?? $reference);
 
-        if (empty($identifier) && empty($reference)) {
-            return null;
-        }
+        if (empty($identifier) && empty($reference)) return null;
 
         $property_type = (string) ($node->nbtipo ?? $node->tipo ?? $node->tipo_ofer ?? '');
         $city = (string) ($node->poblacion ?? $node->ciudad ?? '');
@@ -231,8 +199,6 @@ class Inmovilla_Properties_Manager {
 
     private function create_or_update_property($data) {
         $reference = sanitize_text_field($data['reference']);
-        
-        // EVITAR DUPLICADOS: Buscar por la meta personalizada inmovilla_ref
         $existing = get_posts(array(
             'post_type'      => 'inmovilla_property',
             'meta_key'       => 'inmovilla_ref',
@@ -252,7 +218,8 @@ class Inmovilla_Properties_Manager {
         $status = 'new';
         if (!empty($existing)) {
             $post_args['ID'] = $existing[0];
-            $post_id = wp_update_post($post_args);
+            wp_update_post($post_args);
+            $post_id = $existing[0];
             $status = 'updated';
         } else {
             $post_id = wp_insert_post($post_args);
@@ -260,60 +227,46 @@ class Inmovilla_Properties_Manager {
 
         if (is_wp_error($post_id) || !$post_id) return false;
 
-        // --- Guardado de Metadatos ---
-        update_post_meta($post_id, '_inmovilla_id', $data['id_inmovilla']);
+        // Metadatos Pro
         update_post_meta($post_id, 'inmovilla_ref', $reference);
         update_post_meta($post_id, 'inmovilla_precioinmo', $data['price_sale']);
         update_post_meta($post_id, 'inmovilla_precioalq', $data['price_rent']);
-        update_post_meta($post_id, 'inmovilla_outlet', $data['price_outlet']);
         update_post_meta($post_id, 'inmovilla_m_cons', $data['m_cons']);
         update_post_meta($post_id, 'inmovilla_m_uties', $data['m_uties']);
         update_post_meta($post_id, 'inmovilla_m_parcela', $data['m_parcela']);
-        update_post_meta($post_id, 'inmovilla_m_terraza', $data['m_terraza']);
-        update_post_meta($post_id, 'inmovilla_antiguedad', $data['antiguedad']);
-        update_post_meta($post_id, 'inmovilla_gastos_com', $data['gastos_com']);
-        update_post_meta($post_id, 'inmovilla_numplanta', $data['numplanta']);
         update_post_meta($post_id, 'inmovilla_total_hab', $data['total_rooms']);
-        update_post_meta($post_id, 'inmovilla_habdobles', $data['bedrooms_double']);
         update_post_meta($post_id, 'inmovilla_banyos', $data['bathrooms']);
-        update_post_meta($post_id, 'inmovilla_aseos', $data['aseos']);
+        update_post_meta($post_id, 'inmovilla_destacado', $data['destacado']);
         update_post_meta($post_id, 'inmovilla_latitud', $data['latitud']);
         update_post_meta($post_id, 'inmovilla_altitud', $data['altitud']);
-        update_post_meta($post_id, 'inmovilla_destacado', $data['destacado']);
-
-        // Features (Booleanos)
+        
+        // Características
         update_post_meta($post_id, 'inmovilla_ascensor', $data['feat_lift']);
         update_post_meta($post_id, 'inmovilla_aire_con', $data['feat_ac']);
-        update_post_meta($post_id, 'inmovilla_calefaccion', $data['feat_heating']);
         update_post_meta($post_id, 'inmovilla_piscina_com', $data['feat_pool_com']);
         update_post_meta($post_id, 'inmovilla_piscina_prop', $data['feat_pool_prop']);
         update_post_meta($post_id, 'inmovilla_plaza_gara', $data['feat_garage']);
-        update_post_meta($post_id, 'inmovilla_trastero', $data['feat_storage']);
         update_post_meta($post_id, 'inmovilla_vistasalmar', $data['feat_sea_views']);
 
-        // --- Repetidores ACF (Galería y Vídeo) ---
+        // ACF Repetidores
         if (!empty($data['images'])) {
-            $gallery_rows = array();
-            foreach ($data['images'] as $url) { $gallery_rows[] = array('url' => $url); }
-            update_field('inmovilla_gallery_urls', $gallery_rows, $post_id);
+            $gallery = array();
+            foreach ($data['images'] as $url) { $gallery[] = array('url' => $url); }
+            update_field('inmovilla_gallery_urls', $gallery, $post_id);
+            if (!has_post_thumbnail($post_id)) $this->upload_image_url($post_id, $data['images'][0]);
         }
         if (!empty($data['video_codes'])) {
-            $video_rows = array();
-            foreach ($data['video_codes'] as $code) { $video_rows[] = array('code' => $code); }
-            update_field('inmovilla_video_codes', $video_rows, $post_id);
+            $videos = array();
+            foreach ($data['video_codes'] as $code) { $videos[] = array('code' => $code); }
+            update_field('inmovilla_video_codes', $videos, $post_id);
         }
 
-        // --- Taxonomías ---
+        // Taxonomías
         if (!empty($data['action'])) wp_set_object_terms($post_id, $data['action'], 'accion', false);
         if (!empty($data['type'])) wp_set_object_terms($post_id, $data['type'], 'tipo_propiedad', false);
         if (!empty($data['city'])) wp_set_object_terms($post_id, $data['city'], 'ciudad', false);
         if (!empty($data['zone'])) wp_set_object_terms($post_id, $data['zone'], 'zona', false);
         if (!empty($data['conservacion'])) wp_set_object_terms($post_id, $data['conservacion'], 'conservacion', false);
-
-        // Imagen destacada
-        if (!empty($data['images']) && !has_post_thumbnail($post_id)) {
-            $this->upload_image_url($post_id, $data['images'][0]);
-        }
 
         return ['id' => $post_id, 'status' => $status];
     }
