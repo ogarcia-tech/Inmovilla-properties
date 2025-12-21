@@ -194,6 +194,12 @@ class Inmovilla_Properties_Manager {
             'images'       => $this->extract_images($node),
             'video_codes'  => $this->extract_videos($node),
             'raw'          => json_decode(json_encode($node), true),
+            'provincia'      => (string) ($node->provincia ?? ''),
+            'orientacion'    => (string) ($node->orientacion ?? ''),
+            'tipo_agua'      => (string) ($node->tagua ?? ''),
+            'tipo_calefac'   => (string) ($node->tcalefaccion ?? ''),
+            'emisionesletra' => (string) ($node->emisionesletra ?? ''),
+            'emisionesvalor' => (float) ($node->emisionesvalor ?? 0),
         );
     }
 
@@ -239,6 +245,12 @@ class Inmovilla_Properties_Manager {
         update_post_meta($post_id, 'inmovilla_destacado', $data['destacado']);
         update_post_meta($post_id, 'inmovilla_latitud', $data['latitud']);
         update_post_meta($post_id, 'inmovilla_altitud', $data['altitud']);
+        update_post_meta($post_id, 'inmovilla_provincia', $data['provincia']);
+        update_post_meta($post_id, 'inmovilla_orientacion', $data['orientacion']);
+        update_post_meta($post_id, 'inmovilla_tagua', $data['tipo_agua']);
+        update_post_meta($post_id, 'inmovilla_tcalefaccion', $data['tipo_calefac']);
+        update_post_meta($post_id, 'inmovilla_emisionesletra', $data['emisionesletra']);
+        update_post_meta($post_id, 'inmovilla_emisionesvalor', $data['emisionesvalor']);
         
         // Características
         update_post_meta($post_id, 'inmovilla_ascensor', $data['feat_lift']);
