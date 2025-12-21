@@ -141,7 +141,34 @@ if (!defined('ABSPATH')) {
         <?php submit_button(); ?>
     </form>
 </div>
-
+<div class="inmovilla-history" style="margin-top: 40px; padding: 20px; background: #fff; border: 1px solid #ccd0d4;">
+    <h3>Historial de Sincronización</h3>
+    <table class="wp-list-table widefat fixed striped">
+        <thead>
+            <tr>
+                <th>Fecha y Hora</th>
+                <th>Total en XML</th>
+                <th>Nuevas</th>
+                <th>Actualizadas</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php 
+            $history = get_option('inmovilla_sync_history', []);
+            if (empty($history)): ?>
+                <tr><td colspan="4">No hay registros de sincronización.</td></tr>
+            <?php else:
+                foreach ($history as $log): ?>
+                <tr>
+                    <td><?php echo date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($log['fecha'])); ?></td>
+                    <td><strong><?php echo $log['total']; ?></strong></td>
+                    <td><span style="color:#46b450; font-weight:bold;">+ <?php echo $log['nuevas']; ?></span></td>
+                    <td><span style="color:#0073aa; font-weight:bold;">~ <?php echo $log['actualizadas']; ?></span></td>
+                </tr>
+            <?php endforeach; endif; ?>
+        </tbody>
+    </table>
+</div>
 <script>
 function togglePasswordVisibility(fieldId) {
     const field = document.getElementById(fieldId);
