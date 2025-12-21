@@ -72,6 +72,43 @@ class Inmovilla_Admin_Settings {
         $this->options = get_option('inmovilla_properties_options');
         include INMOVILLA_PROPERTIES_PLUGIN_DIR . 'admin/partials/settings-form.php';
     }
+    /**
+     * Botón de actualización API individual
+     */
+    add_action('post_submitbox_misc_actions', 'inmovilla_add_api_update_button');
+    function inmovilla_add_api_update_button($post) {
+        if ($post->post_type !== 'inmovilla_property') return;
+        ?>
+        <div class="misc-pub-section">
+            <button type="button" id="inmo-api-update" class="button button-secondary" data-post-id="<?php echo $post->ID; ?>">
+                <span class="dashicons dashicons-update" style="vertical-align: text-bottom;"></span> Actualizar vía API
+            </button>
+            <script>
+                jQuery('#inmo-api-update').on('click', function() {
+                    const btn = jQuery(this);
+                    if(!confirm('¿Actualizar datos críticos desde la API?')) return;
+                    btn.prop('disabled', true).text('Procesando...');
+                    jQuery.post(ajaxurl, {
+                        action: 'inmo_update_single',
+                        post_id: btn.data('post-id'),
+                        nonce: '<?php echo wp_create_nonce("inmo_single_nonce"); ?>'
+                    }, function(res) {
+                        alert(res.success ? 'Propiedad actualizada con éxito.' : 'Error en la conexión API.');
+                        location.reload();
+                    });
+                });
+            </script>
+        </div>
+        <?php
+    }
+    
+    add_action('wp_ajax_inmo_update_single', function() {
+        check_ajax_referer('inmo_single_nonce', 'nonce');
+        if (!current_user_can('edit_posts')) wp_send_json_error();
+        $manager = new Inmovilla_Properties_Manager();
+        $success = $manager->update_single_property_via_api($_POST['post_id']);
+        $success ? wp_send_json_success() : wp_send_json_error();
+    });
 
     /**
      * Ejecuta la sincronización manual desde AJAX
