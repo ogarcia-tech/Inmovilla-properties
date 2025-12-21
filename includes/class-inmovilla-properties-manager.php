@@ -1,6 +1,6 @@
 <?php
 /**
- * Gestión de propiedades mediante Sincronización XML
+ * Gestión de propiedades mediante Sincronización XML con soporte API e Historial
  */
 
 if (!defined('ABSPATH')) {
@@ -23,6 +23,9 @@ class Inmovilla_Properties_Manager {
         $this->sync_properties_from_xml();
     }
 
+    /**
+     * Sincronización XML Principal con control de duplicados e Historial
+     */
     public function sync_properties_from_xml() {
         @set_time_limit(0);
         @ini_set('memory_limit', '512M');
@@ -34,7 +37,7 @@ class Inmovilla_Properties_Manager {
             return;
         }
 
-        $xml_response = wp_remote_get($xml_url, array('timeout' => 120));
+        $xml_response = wp_remote_get($xml_url, array('timeout' => 300));
 
         if (is_wp_error($xml_response)) {
             error_log('Inmovilla: Error descargando XML - ' . $xml_response->get_error_message());
@@ -42,7 +45,6 @@ class Inmovilla_Properties_Manager {
         }
 
         $body = wp_remote_retrieve_body($xml_response);
-
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string($body);
 
@@ -58,23 +60,71 @@ class Inmovilla_Properties_Manager {
             $properties_nodes = $xml->inmueble;
         }
 
+        $stats = ['nuevas' => 0, 'actualizadas' => 0];
         $active_refs = array();
 
         foreach ($properties_nodes as $property_node) {
             $prop_data = $this->parse_xml_node($property_node);
             if ($prop_data) {
-                $post_id = $this->create_or_update_property($prop_data);
-                if ($post_id) {
+                $result = $this->create_or_update_property($prop_data);
+                if ($result) {
                     $active_refs[] = sanitize_text_field($prop_data['reference']);
+                    if ($result['status'] === 'new') $stats['nuevas']++;
+                    if ($result['status'] === 'updated') $stats['actualizadas']++;
                 }
             }
         }
 
+        // Registrar en el historial y limpiar antiguas
+        $this->add_to_history($stats['nuevas'], $stats['actualizadas'], count($active_refs));
         if (!empty($active_refs)) {
             $this->cleanup_old_properties($active_refs);
         }
 
         update_option('inmovilla_last_sync', current_time('mysql'));
+    }
+
+    /**
+     * Actualización de un único inmueble llamando a la API
+     */
+    public function update_single_property_via_api($post_id) {
+        $ref = get_post_meta($post_id, 'inmovilla_ref', true);
+        $agencia = inmovilla_get_setting('numagencia', '2');
+        $pass = inmovilla_get_setting('api_password', '82ku9xz2aw3');
+        
+        // Llamada a la API JSON para refrescar datos críticos
+        $api_url = "https://apiweb.inmovilla.com/apiweb/apiweb.php?numagencia=$agencia&password=$pass&idioma=1&tipo=propiedad&where=ref='$ref'";
+        
+        $response = wp_remote_get($api_url);
+        if (is_wp_error($response)) return false;
+
+        $data = json_decode(wp_remote_retrieve_body($response), true);
+        if (empty($data[0])) return false;
+
+        $item = $data[0];
+
+        // Actualizamos solo campos clave vía API
+        update_post_meta($post_id, 'inmovilla_precioinmo', $item['precioinmo']);
+        update_post_meta($post_id, 'inmovilla_outlet', $item['outlet'] ?? 0);
+        
+        wp_update_post([
+            'ID' => $post_id,
+            'post_title' => sanitize_text_field($item['titulo1'] ?? get_the_title($post_id)),
+            'post_content' => wp_kses_post($item['descrip1'] ?? get_the_content(null, false, $post_id))
+        ]);
+
+        return true;
+    }
+
+    private function add_to_history($nuevas, $actualizadas, $total) {
+        $history = get_option('inmovilla_sync_history', []);
+        array_unshift($history, [
+            'fecha' => current_time('mysql'),
+            'nuevas' => $nuevas,
+            'actualizadas' => $actualizadas,
+            'total' => $total
+        ]);
+        update_option('inmovilla_sync_history', array_slice($history, 0, 10)); // Guardar últimas 10
     }
 
     private function extract_videos($node) {
@@ -115,12 +165,6 @@ class Inmovilla_Properties_Manager {
             return null;
         }
 
-        $venta = (float) ($node->precio_venta ?? $node->precioinmo ?? 0);
-        $alquiler = (float) ($node->precio_alquiler ?? $node->precioalq ?? 0);
-        
-        $images = $this->extract_images($node);
-        $videos = $this->extract_videos($node);
-
         $property_type = (string) ($node->nbtipo ?? $node->tipo ?? $node->tipo_ofer ?? '');
         $city = (string) ($node->poblacion ?? $node->ciudad ?? '');
 
@@ -129,22 +173,16 @@ class Inmovilla_Properties_Manager {
             'reference'    => $reference ?: $identifier,
             'title'        => (string) ($node->titulo1 ?? $node->titulo ?? $property_type . ' ' . $city),
             'description'  => (string) ($node->descripcion ?? $node->descrip1 ?? ''),
-            
-            // Precios y Operación
-            'price_sale'   => $venta,
-            'price_rent'   => $alquiler,
+            'price_sale'   => (float) ($node->precio_venta ?? $node->precioinmo ?? 0),
+            'price_rent'   => (float) ($node->precio_alquiler ?? $node->precioalq ?? 0),
             'price_outlet' => (float) ($node->outlet ?? 0),
             'monthly_type' => (string) ($node->tipomensual ?? ''),
-            'operation_key' => (int) ($node->keyacci ?? 0),
+            'operation_key'=> (int) ($node->keyacci ?? 0),
             'action'       => (string) ($node->accion ?? ''),
-
-            // Ubicación y Taxonomías
             'type'         => $property_type,
             'city'         => $city,
             'zone'         => (string) ($node->zona ?? ''),
             'conservacion' => (string) ($node->conservacion ?? ''),
-            
-            // Metros, Dimensiones y Gastos
             'm_cons'       => (float) ($node->m_cons ?? 0),
             'm_uties'      => (float) ($node->m_uties ?? 0),
             'm_parcela'    => (float) ($node->m_parcela ?? 0),
@@ -152,15 +190,11 @@ class Inmovilla_Properties_Manager {
             'antiguedad'   => (int) ($node->antiguedad ?? 0),
             'gastos_com'   => (float) ($node->gastos_com ?? 0),
             'numplanta'    => (string) ($node->numplanta ?? ''),
-
-            // Habitaciones y Baños
             'bedrooms'     => (int) ($node->habitaciones ?? 0),
             'bedrooms_double' => (int) ($node->habdobles ?? 0),
             'bathrooms'    => (int) ($node->banyos ?? 0),
             'aseos'        => (int) ($node->aseos ?? 0),
             'total_rooms'  => (int) ($node->total_hab ?? 0),
-
-            // Features / Equipamiento (1 o 0)
             'feat_lift'    => (int) ($node->ascensor ?? 0),
             'feat_ac'      => (int) ($node->aire_con ?? 0),
             'feat_heating' => (int) ($node->calefaccion ?? 0),
@@ -180,31 +214,25 @@ class Inmovilla_Properties_Manager {
             'feat_first_line' => (int) ($node->primera_line ?? 0),
             'feat_solarium' => (int) ($node->solarium ?? 0),
             'feat_basement' => (int) ($node->sotano ?? 0),
-            
-            // Geoposicionamiento
             'latitud'      => (string) ($node->latitud ?? ''),
             'altitud'      => (string) ($node->altitud ?? ''),
-            
-            // Certificación Energética
             'energy_letter'=> (string) ($node->energialetra ?? ''),
             'energy_value' => (float) ($node->energiavalor ?? 0),
             'emission_letter'=> (string) ($node->emisionesletra ?? ''),
             'emission_value' => (float) ($node->emisionesvalor ?? 0),
-
-            // Otros
             'distmar'      => (int) ($node->distmar ?? 0),
             'destacado'    => (int) ($node->destacado ?? 0),
             'numpanos'     => (int) ($node->numpanos ?? 0),
-
-            // Multimedia
-            'images'       => $images,
-            'video_codes'  => $videos,
+            'images'       => $this->extract_images($node),
+            'video_codes'  => $this->extract_videos($node),
             'raw'          => json_decode(json_encode($node), true),
         );
     }
 
     private function create_or_update_property($data) {
         $reference = sanitize_text_field($data['reference']);
+        
+        // EVITAR DUPLICADOS: Buscar por la meta personalizada inmovilla_ref
         $existing = get_posts(array(
             'post_type'      => 'inmovilla_property',
             'meta_key'       => 'inmovilla_ref',
@@ -221,16 +249,18 @@ class Inmovilla_Properties_Manager {
             'post_type'    => 'inmovilla_property',
         );
 
+        $status = 'new';
         if (!empty($existing)) {
             $post_args['ID'] = $existing[0];
             $post_id = wp_update_post($post_args);
+            $status = 'updated';
         } else {
             $post_id = wp_insert_post($post_args);
         }
 
         if (is_wp_error($post_id) || !$post_id) return false;
 
-        // --- Mapeo de Campos ACF (update_post_meta) ---
+        // --- Guardado de Metadatos ---
         update_post_meta($post_id, '_inmovilla_id', $data['id_inmovilla']);
         update_post_meta($post_id, 'inmovilla_ref', $reference);
         update_post_meta($post_id, 'inmovilla_precioinmo', $data['price_sale']);
@@ -249,9 +279,7 @@ class Inmovilla_Properties_Manager {
         update_post_meta($post_id, 'inmovilla_aseos', $data['aseos']);
         update_post_meta($post_id, 'inmovilla_latitud', $data['latitud']);
         update_post_meta($post_id, 'inmovilla_altitud', $data['altitud']);
-        update_post_meta($post_id, 'inmovilla_distmar', $data['distmar']);
         update_post_meta($post_id, 'inmovilla_destacado', $data['destacado']);
-        update_post_meta($post_id, 'inmovilla_numpanos', $data['numpanos']);
 
         // Features (Booleanos)
         update_post_meta($post_id, 'inmovilla_ascensor', $data['feat_lift']);
@@ -261,21 +289,9 @@ class Inmovilla_Properties_Manager {
         update_post_meta($post_id, 'inmovilla_piscina_prop', $data['feat_pool_prop']);
         update_post_meta($post_id, 'inmovilla_plaza_gara', $data['feat_garage']);
         update_post_meta($post_id, 'inmovilla_trastero', $data['feat_storage']);
-        update_post_meta($post_id, 'inmovilla_terraza', $data['feat_terrace']);
-        update_post_meta($post_id, 'inmovilla_balcon', $data['feat_balcony']);
         update_post_meta($post_id, 'inmovilla_vistasalmar', $data['feat_sea_views']);
-        update_post_meta($post_id, 'inmovilla_alarma', $data['feat_alarm']);
-        update_post_meta($post_id, 'inmovilla_chimenea', $data['feat_fireplace']);
-        update_post_meta($post_id, 'inmovilla_barbacoa', $data['feat_bbq']);
-        update_post_meta($post_id, 'inmovilla_primera_line', $data['feat_first_line']);
-        update_post_meta($post_id, 'inmovilla_solarium', $data['feat_solarium']);
-        update_post_meta($post_id, 'inmovilla_sotano', $data['feat_basement']);
 
-        // Certificación Energética
-        update_post_meta($post_id, 'inmovilla_energialetra', $data['energy_letter']);
-        update_post_meta($post_id, 'inmovilla_energiavalor', $data['energy_value']);
-
-        // --- Mapeo de Repetidores ACF (Galería y Vídeo) ---
+        // --- Repetidores ACF (Galería y Vídeo) ---
         if (!empty($data['images'])) {
             $gallery_rows = array();
             foreach ($data['images'] as $url) { $gallery_rows[] = array('url' => $url); }
@@ -299,7 +315,7 @@ class Inmovilla_Properties_Manager {
             $this->upload_image_url($post_id, $data['images'][0]);
         }
 
-        return $post_id;
+        return ['id' => $post_id, 'status' => $status];
     }
 
     private function upload_image_url($post_id, $url) {
