@@ -17,7 +17,7 @@ class Inmovilla_Admin_Settings {
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
         add_action('wp_ajax_inmovilla_sync_properties', array($this, 'ajax_sync_properties'));
         
-        // Registro de acciones para el botón de actualización API individual
+        // Registro del botón API individual e Historial
         add_action('post_submitbox_misc_actions', array($this, 'add_api_update_button'));
         add_action('wp_ajax_inmo_update_single', array($this, 'ajax_update_single_property'));
     }
@@ -42,10 +42,11 @@ class Inmovilla_Admin_Settings {
                 INMOVILLA_PROPERTIES_VERSION,
                 true
             );
-
+            
             wp_localize_script('inmovilla-admin-js', 'inmovilla_admin_ajax', array(
                 'ajax_url' => admin_url('admin-ajax.php'),
-                'nonce' => wp_create_nonce('inmovilla_admin_nonce')
+                'nonce' => wp_create_nonce('inmovilla_admin_nonce'),
+                'single_nonce' => wp_create_nonce('inmo_single_nonce')
             ));
         }
     }
@@ -58,13 +59,10 @@ class Inmovilla_Admin_Settings {
         $this->options = get_option('inmovilla_properties_options');
         include INMOVILLA_PROPERTIES_PLUGIN_DIR . 'admin/partials/settings-form.php';
         
-        // Mostrar tabla de historial al final de los ajustes
+        // Renderizar historial al final de los ajustes
         $this->render_sync_history();
     }
 
-    /**
-     * Renderiza el historial de sincronización
-     */
     private function render_sync_history() {
         $history = get_option('inmovilla_sync_history', []);
         ?>
@@ -73,15 +71,15 @@ class Inmovilla_Admin_Settings {
             <table class="wp-list-table widefat fixed striped">
                 <thead>
                     <tr>
-                        <th><?php _e('Fecha', 'inmovilla-properties'); ?></th>
-                        <th><?php _e('Total XML', 'inmovilla-properties'); ?></th>
-                        <th><?php _e('Nuevas', 'inmovilla-properties'); ?></th>
-                        <th><?php _e('Actualizadas', 'inmovilla-properties'); ?></th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Nuevas</th>
+                        <th>Actualizadas</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($history)): ?>
-                        <tr><td colspan="4"><?php _e('No hay registros aún.', 'inmovilla-properties'); ?></td></tr>
+                        <tr><td colspan="4">No hay registros aún.</td></tr>
                     <?php else: foreach ($history as $log): ?>
                         <tr>
                             <td><?php echo $log['fecha']; ?></td>
@@ -96,35 +94,26 @@ class Inmovilla_Admin_Settings {
         <?php
     }
 
-    /**
-     * Botón de actualización API en la ficha de propiedad
-     */
     public function add_api_update_button($post) {
         if ($post->post_type !== 'inmovilla_property') return;
         ?>
         <div class="misc-pub-section">
             <button type="button" id="inmo-api-update" class="button button-secondary" data-post-id="<?php echo $post->ID; ?>">
-                <span class="dashicons dashicons-update" style="vertical-align: middle; margin-bottom: 3px;"></span> 
-                <?php _e('Actualizar vía API', 'inmovilla-properties'); ?>
+                <span class="dashicons dashicons-update" style="vertical-align: middle;"></span> Actualizar vía API
             </button>
             <script>
                 jQuery(document).ready(function($) {
                     $('#inmo-api-update').on('click', function() {
                         const btn = $(this);
-                        if(!confirm('<?php _e("¿Actualizar datos críticos (precio, título, descripción) desde la API?", "inmovilla-properties"); ?>')) return;
-                        btn.prop('disabled', true).text('<?php _e("Procesando...", "inmovilla-properties"); ?>');
+                        if(!confirm('¿Actualizar datos desde la API?')) return;
+                        btn.prop('disabled', true).text('Procesando...');
                         $.post(ajaxurl, {
                             action: 'inmo_update_single',
                             post_id: btn.data('post-id'),
                             nonce: '<?php echo wp_create_nonce("inmo_single_nonce"); ?>'
                         }, function(res) {
-                            if(res.success) {
-                                alert('<?php _e("Propiedad actualizada correctamente", "inmovilla-properties"); ?>');
-                                location.reload();
-                            } else {
-                                alert('<?php _e("Error al actualizar: ", "inmovilla-properties"); ?>' + (res.data.message || 'Error desconocido'));
-                                btn.prop('disabled', false).text('<?php _e("Actualizar vía API", "inmovilla-properties"); ?>');
-                            }
+                            alert(res.success ? 'Actualizado correctamente' : 'Error en la conexión');
+                            location.reload();
                         });
                     });
                 });
@@ -135,12 +124,10 @@ class Inmovilla_Admin_Settings {
 
     public function ajax_update_single_property() {
         check_ajax_referer('inmo_single_nonce', 'nonce');
-        if (!current_user_can('edit_posts')) wp_send_json_error(['message' => 'Sin permisos']);
-        
+        if (!current_user_can('edit_posts')) wp_send_json_error();
         $manager = new Inmovilla_Properties_Manager();
         $success = $manager->update_single_property_via_api($_POST['post_id']);
-        
-        $success ? wp_send_json_success() : wp_send_json_error(['message' => 'Error en la conexión API']);
+        $success ? wp_send_json_success() : wp_send_json_error();
     }
 
     public function ajax_sync_properties() {
