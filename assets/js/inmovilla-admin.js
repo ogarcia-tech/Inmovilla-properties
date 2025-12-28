@@ -15,7 +15,6 @@
         init: function() {
             this.setupTabs();
             this.setupColorPickers();
-            this.setupFormValidation();
             this.setupApiTesting();
             this.setupCacheManagement();
             this.setupManualSync();
@@ -102,24 +101,6 @@
                 var color = $(this).val();
                 $(this).siblings('.inmovilla-color-preview').css('background-color', color);
                 $(this).siblings('.inmovilla-color-value').text(color);
-            });
-        },
-
-        setupFormValidation: function() {
-            $('#inmovilla-settings-form').on('submit', function(e) {
-                var $apiTokenField = $('#inmovilla_api_token');
-                if (!$apiTokenField.length) {
-                    return true;
-                }
-
-                var apiToken = $apiTokenField.val();
-                if (!apiToken || apiToken.length < 10) {
-                    e.preventDefault();
-                    InmovillaAdmin.showNotification('El token de API es obligatorio', 'error');
-                    return false;
-                }
-
-                return true;
             });
         },
 
