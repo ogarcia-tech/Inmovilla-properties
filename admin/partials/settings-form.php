@@ -183,26 +183,4 @@ function togglePasswordVisibility(fieldId) {
     }
 }
 
-// Tabs functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const tabs = document.querySelectorAll('.nav-tab');
-    const contents = document.querySelectorAll('.tab-content');
-    
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Remove active class from all tabs and contents
-            tabs.forEach(t => t.classList.remove('nav-tab-active'));
-            contents.forEach(c => c.classList.remove('active'));
-            
-            // Add active class to clicked tab
-            this.classList.add('nav-tab-active');
-            
-            // Show corresponding content
-            const target = this.getAttribute('href').substring(1);
-            document.getElementById(target).classList.add('active');
-        });
-    });
-});
 </script>

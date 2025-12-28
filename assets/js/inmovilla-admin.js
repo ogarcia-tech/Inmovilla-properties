@@ -23,13 +23,37 @@
         },
 
         setupTabs: function() {
-            $('.inmovilla-admin-nav-tab').on('click', function(e) {
-                e.preventDefault();
-                var targetTab = $(this).data('tab');
-                $('.inmovilla-admin-nav-tab').removeClass('active');
-                $(this).addClass('active');
+            var $tabs = $('.inmovilla-admin-nav-tab');
+
+            if (!$tabs.length) {
+                return;
+            }
+
+            var activateTab = function(targetTab) {
+                $tabs.removeClass('active nav-tab-active');
+                $tabs.filter('[data-tab="' + targetTab + '"]').addClass('active nav-tab-active');
                 $('.inmovilla-tab-content').removeClass('active');
                 $('#' + targetTab).addClass('active');
+            };
+
+            var storedTab = localStorage.getItem('inmovilla_admin_active_tab');
+            if (storedTab && $('#' + storedTab).length) {
+                activateTab(storedTab);
+            } else {
+                var defaultTab = $tabs.first().data('tab');
+                if (defaultTab) {
+                    activateTab(defaultTab);
+                }
+            }
+
+            $tabs.on('click', function(e) {
+                e.preventDefault();
+                var targetTab = $(this).data('tab');
+                if (!targetTab) {
+                    return;
+                }
+
+                activateTab(targetTab);
                 localStorage.setItem('inmovilla_admin_active_tab', targetTab);
             });
         },
@@ -83,12 +107,19 @@
 
         setupFormValidation: function() {
             $('#inmovilla-settings-form').on('submit', function(e) {
-                var apiToken = $('#inmovilla_api_token').val();
+                var $apiTokenField = $('#inmovilla_api_token');
+                if (!$apiTokenField.length) {
+                    return true;
+                }
+
+                var apiToken = $apiTokenField.val();
                 if (!apiToken || apiToken.length < 10) {
                     e.preventDefault();
                     InmovillaAdmin.showNotification('El token de API es obligatorio', 'error');
                     return false;
                 }
+
+                return true;
             });
         },
 
