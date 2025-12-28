@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Inmovilla Properties
  * Plugin URI: https://github.com/tuempresa/inmovilla-properties
- * Version: 2.0
+ * Version: 3.0
  * Author: Metricaweb
  * Author URI: https://metricaweb.es
  * License: GPL v2 or later
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 }
 
 // --- CONSTANTES GLOBALES ---
-define('INMOVILLA_PROPERTIES_VERSION', '2.0.3-final-fix');
+define('INMOVILLA_PROPERTIES_VERSION', '3.0');
 define('INMOVILLA_PROPERTIES_PLUGIN_FILE', __FILE__);
 define('INMOVILLA_PROPERTIES_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('INMOVILLA_PROPERTIES_PLUGIN_URL', plugin_dir_url(__FILE__));
